@@ -70,8 +70,6 @@ dataFileL.close()
 #---------------------------
 
 
-
-
 #---------------------------
 # Create a time vector
 #---------------------------
@@ -93,7 +91,7 @@ detL1 = lal.CachedDetectors[detMap['L1']]
 #--------------------------------------------------------------
 # Set a GPS time (this is just a random value for this example)
 #--------------------------------------------------------------
-tgps = lal.LIGOTimeGPS(967966720, 0)
+tgps = lal.LIGOTimeGPS(gpsStartH, 0)
 
 #---------------------------------------------------------
 # get right ascension and declination of source in radians
