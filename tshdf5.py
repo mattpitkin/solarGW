@@ -4,7 +4,7 @@
 import numpy as np
 import pylab as plt
 import h5py
-#import lal
+import lal
 from astropy.coordinates import get_sun
 import astropy.time as Time
 import astropy
