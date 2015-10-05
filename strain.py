@@ -65,13 +65,13 @@ dataFileL.close()
 # Applying a highpass filter
 #---------------------------
 strainL = strainL.highpass(40)
-strainH = strainL.highpass(40)
+strainH = strainH.highpass(40)
 
 #---------------------------
 # Applying a lowpass filter
 #---------------------------
 strainL = strainL.lowpass(1000)
-strainH = strainL.lowpass(1000)
+strainH = strainH.lowpass(1000)
 
 
 #---------------------------
