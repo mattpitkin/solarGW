@@ -9,6 +9,7 @@ import lal
 from astropy.coordinates import get_sun
 import astropy.time as Time
 import astropy
+from gwpy.timeseries import TimeSeries
 
 #---------------
 # Open the File
@@ -43,7 +44,7 @@ gpsEndH   = gpsStartH + durationH
 detectorH = metaH['Detector']
 dataFileH.close()
 
-############################
+
 #--------------------------#
 # Redo this for L detector #
 #--------------------------#
@@ -60,14 +61,17 @@ detectorL = metaL['Detector']
 dataFileL.close()
 
 #############################
-#----------------------------
-# Applying a high-pass filter
-#----------------------------
-
+#---------------------------
+# Applying a highpass filter
+#---------------------------
+strainL = strainL.highpass(40)
+strainH = strainL.highpass(40)
 
 #---------------------------
-# Applying a low-pass filter
+# Applying a lowpass filter
 #---------------------------
+strainL = strainL.lowpass(1000)
+strainH = strainL.lowpass(1000)
 
 
 #---------------------------
@@ -96,9 +100,9 @@ tgps = lal.LIGOTimeGPS(gpsStartH, 0)
 #---------------------------------------------------------
 # get right ascension and declination of source in radians
 #---------------------------------------------------------
-get_sun(Time(967966720.0,format='gps'))
-ra  = get_sun.ra.hour  * np.pi/12
-dec = get_sun.dec.hour * np.pi/12
+coords = get_sun(Time(967966720.0,format='gps'))
+ra  = coords.ra.hour  * np.pi/12
+dec = coords.dec.hour * np.pi/12
 
 #---------------
 # get time delay
