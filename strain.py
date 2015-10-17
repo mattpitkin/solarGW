@@ -64,14 +64,14 @@ dataFileL.close()
 #---------------------------
 # Applying a highpass filter
 #---------------------------
-strainL = strainL.highpass(40)
-strainH = strainH.highpass(40)
+strainL = strainL.highpass(100)
+strainH = strainH.highpass(100)
 
 #---------------------------
 # Applying a lowpass filter
 #---------------------------
-strainL = strainL.lowpass(1000)
-strainH = strainH.lowpass(1000)
+strainL = strainL.lowpass(300)
+strainH = strainH.lowpass(300)
 
 
 #---------------------------
@@ -98,14 +98,14 @@ detL1 = lal.CachedDetectors[detMap['L1']]
 tgps = lal.LIGOTimeGPS(gpsStartH, 0)
 
 #---------------------------------------------------------
-# get right ascension and declination of source in radians
+# Get right ascension and declination of source in radians
 #---------------------------------------------------------
 coords = get_sun(Time(967966720.0,format='gps'))
 ra  = coords.ra.hour  * np.pi/12
 dec = coords.dec.hour * np.pi/12
 
 #---------------
-# get time delay
+# Get time delay
 #---------------
 tdelay = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra, dec, tgps)
 
