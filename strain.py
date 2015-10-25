@@ -64,14 +64,24 @@ dataFileL.close()
 #---------------------------
 # Applying a highpass filter
 #---------------------------
+<<<<<<< HEAD
+strainL = TimeSeries(strainL)
+strainH = TimeSeries(strainH)
+=======
+>>>>>>> 76f254f3aa60226f7caa462f1b7128360b475c1b
 strainL = strainL.highpass(100)
 strainH = strainH.highpass(100)
 
 #---------------------------
 # Applying a lowpass filter
 #---------------------------
+<<<<<<< HEAD
+#strainL = strainL.lowpass(300)
+#strainH = strainH.lowpass(300)
+=======
 strainL = strainL.lowpass(300)
 strainH = strainH.lowpass(300)
+>>>>>>> 76f254f3aa60226f7caa462f1b7128360b475c1b
 
 
 #---------------------------
