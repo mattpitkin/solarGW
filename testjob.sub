@@ -1,0 +1,9 @@
+universe=vanilla
+executable=
+arguments='--framesL1 --framesH1 --start$(starttime) --end$(endtime) --output'$(outdir)
+log = /log.txt
+output = /out.txt
+error = /error.txt
+notification = never
+accounting_group = aluk.solargw
+queue 1
