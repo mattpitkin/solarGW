@@ -1,9 +1,10 @@
 universe=vanilla
-executable=
+executable= /home/spxha/batchstrain.py
 arguments='--framesL1 --framesH1 --start$(starttime) --end$(endtime) --output'$(outdir)
-log = /log.txt
-output = /out.txt
-error = /error.txt
+log = /home/spxha/log.txt
+output = /home/spxha/out.txt
+error = /home/spxha/error.txt
 notification = never
-accounting_group = aluk.solargw
+accounting_group = aluk.dev.s6.sgwb.solargw
+accounting_group_user = husni.almoubayyed
 queue 1

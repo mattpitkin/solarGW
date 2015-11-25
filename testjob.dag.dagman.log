@@ -1,0 +1,14 @@
+000 (5029214.000.000) 11/24 22:35:00 Job submitted from host: <131.251.239.188:53932>
+...
+001 (5029214.000.000) 11/24 22:35:01 Job executing on host: <131.251.239.188:53932>
+...
+004 (5029214.000.000) 11/25 12:31:14 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+009 (5029214.000.000) 11/25 12:31:14 Job was aborted by the user.
+	via condor_rm (by user spxha)
+...

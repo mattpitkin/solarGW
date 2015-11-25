@@ -358,3 +358,29 @@
 11/25/15 12:06:45 48681 seconds since last log event
 11/25/15 12:06:45 Pending DAG nodes:
 11/25/15 12:06:45   Node 1, Condor ID 5029225, status STATUS_SUBMITTED
+11/25/15 12:16:47 49283 seconds since last log event
+11/25/15 12:16:47 Pending DAG nodes:
+11/25/15 12:16:47   Node 1, Condor ID 5029225, status STATUS_SUBMITTED
+11/25/15 12:26:48 49884 seconds since last log event
+11/25/15 12:26:48 Pending DAG nodes:
+11/25/15 12:26:48   Node 1, Condor ID 5029225, status STATUS_SUBMITTED
+11/25/15 12:31:14 Received SIGUSR1
+11/25/15 12:31:14 Aborting DAG...
+11/25/15 12:31:14 Writing Rescue DAG to testjob.dag.rescue001...
+11/25/15 12:31:14 Removing submitted jobs...
+11/25/15 12:31:14 Removing any/all submitted Condor/Stork jobs...
+11/25/15 12:31:14 Running: /usr/bin/condor_rm -const DAGManJobId' '=?=' '5029214
+11/25/15 12:31:14 Note: 0 total job deferrals because of -MaxJobs limit (3000)
+11/25/15 12:31:14 Note: 0 total job deferrals because of -MaxIdle limit (100)
+11/25/15 12:31:14 Note: 0 total job deferrals because of node category throttles
+11/25/15 12:31:14 Note: 0 total PRE script deferrals because of -MaxPre limit (0)
+11/25/15 12:31:14 Note: 0 total POST script deferrals because of -MaxPost limit (0)
+11/25/15 12:31:14 Of 1 nodes total:
+11/25/15 12:31:14  Done     Pre   Queued    Post   Ready   Un-Ready   Failed
+11/25/15 12:31:14   ===     ===      ===     ===     ===        ===      ===
+11/25/15 12:31:14     0       0        1       0       0          0        0
+11/25/15 12:31:14 1 job proc(s) currently held
+11/25/15 12:31:14 Wrote metrics file testjob.dag.metrics.
+11/25/15 12:31:14 Metrics not sent because of PEGASUS_METRICS or CONDOR_DEVELOPERS setting.
+11/25/15 12:31:14 Warning: ReadMultipleUserLogs destructor called, but still monitoring 1 log(s)!
+11/25/15 12:31:14 **** condor_scheduniv_exec.5029214.0 (condor_DAGMAN) pid 21915 EXITING WITH STATUS 2
