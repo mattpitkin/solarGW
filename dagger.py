@@ -10,5 +10,5 @@ EndTimes   = timearray[:,1]
 file = open("mainjob.dag", "w")
 for i in range(len(StartTimes)):
 	file.write('JOB '+str(i+1)+' testjob.sub\n')
-	file.write('VARS '+str(i+1)+' starttime='+str(int(StartTimes[i]))+' endtime='+str(int(EndTimes[i]))+'\n')
+	file.write('VARS '+str(i+1)+' starttime="'+str(int(StartTimes[i]))+'" endtime="'+str(int(EndTimes[i]))+'"'+'\n')
 file.close()
