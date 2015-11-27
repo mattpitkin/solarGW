@@ -1,2 +1,2 @@
-JOB 1 testjob.sub
-VARS 1 starttime="962093623" endtime="962098630" 
+JOB 1 /home/spxha/solarGW/testjob.sub
+VARS 1 starttime="962093623" 
