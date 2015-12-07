@@ -4,6 +4,7 @@
 # Import needed modules
 #-----------------------
 from __future__ import division
+import os
 import numpy as np
 import pylab as plt
 import gwpy
@@ -22,8 +23,8 @@ from scipy.signal import filtfilt
 from optparse import OptionParser
 import sys
 parser = OptionParser()
-parser.add_option("--start", dest="starttime", type="int", help="Inputthe GPS s$
-parser.add_option("--end", dest="endtime", type="int", help="Input the GPS end $
+parser.add_option("--start", dest="starttime", type="int", help="Inputthe GPS ")
+parser.add_option("--end", dest="endtime", type="int", help="Input the GPS end ")
 (opts, args) = parser.parse_args()
 if not opts.starttime:
   print "Error... a '--start' option giving the GPS start time is required"
@@ -34,12 +35,13 @@ endtime = opts.endtime
 if starttime < 0 or np.isinf(starttime):
   print "Error... the given start time is not valid"
   sys.exit(1)
-
+print starttime
+print endtime
 #----------------
 # Read Timeseries
 #----------------
 # Read segment instead using gwpy, where starttime and endtime are from the dag file
-pathtoinput = "/home/husni.almoubayyed/"
+pathtoinput = "/home/spxha/"
 strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
 strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
 #-----------
@@ -114,10 +116,10 @@ for i in range(numseg30):
 tdelay = np.repeat(tdelay,int(30/tsH))
 
 # make sure tdelay and timeL are of same length in case integer-ing caused slight inconsistency.
-b = np.ones(len(TimeL)-len(tdelay))*tdelay[-1]
+b = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
 tdelay = np.append(tdelay,b)
 
-TimeL = TimeL - tdelay
+timeL = timeL - tdelay
 
 # at this point timeH and timeL are synchronised
 #
@@ -135,29 +137,33 @@ overtsH = int(30/tsH)
 #---------------
 # Get Background
 #---------------
-background_intervals = np.linspace(1,120,120)*600
-ra_background, background_tdelay, dec_background, coords_background = [[[0] for _ in range(120)] for _ in range(4)]
+background_intervals = np.linspace(1,50,50)*600
+ra_background, background_tdelay, dec_background, coords_background = [[[0] for _ in range(50)] for _ in range(4)]
 background_intervals = background_intervals.astype(int)
 for j in range(len(background_intervals)):
 	coords_background[j] = get_sun(Time.Time(gpsStartH-background_intervals[j],format='gps'))
 	ra_background[j]     = coords_background[j].ra.hour  * np.pi/12
 	dec_background[j]    = coords_background[j].dec.hour * np.pi/12
 	background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background[j], dec_background[j], tgps)
-backstrainL = np.repeat(strainL,len(background_intervals))
-backstrainH = np.repeat(strainH,len(background_intervals))
-backtimeL   = np.repeat(timeL,len(background_intervals))
-backtimeH   = np.repeat(timeH,len(background_intervals))
-backtimeL   = backtimeL - background_tdelay
+# initialise backtimeH and backtimeL
+backtimeH, backtimeL = [[[0] for _ in range(50)] for _ in range(2)]
+for i in range(50):
+        backtimeH[i] = timeH
+        backtimeL[i] = timeL - background_tdelay[i]
 
 bg_idxH,bg_idxL,bg_strain30L,bg_strain30H = [[[0 for _ in range(overtsH)] for _ in range(numseg30)] for _ in range(4)]
-bg_strainprod = [[0] for _ in range(numseg30)]
+bg_strainprod = [[[0] for _ in range(numseg30)] for _ in range(len(background_intervals))]
 for j in range(len(background_intervals)):
 	for i in range(numseg30):
-	bg_idxH = np.where(np.logical_and(seg30[i]<timeH, seg30[i+1]>timeH))
-	bg_idxL = np.where(np.logical_and(seg30[i]<timeL, seg30[i+1]>timeL))
-	bg_strain30L = strainL[idxL]
-	bg_strain30H = strainH[idxH]
-	bg_strainprod[i] = np.dot(strain30H,strain30L)
+		bg_idxH = np.where(np.logical_and(seg30[i]<backtimeH[j], seg30[i+1]>backtimeH[j]))
+		bg_idxL = np.where(np.logical_and(seg30[i]<backtimeL[j], seg30[i+1]>backtimeL[j]))
+		bg_strain30L = strainL[bg_idxL]
+		bg_strain30H = strainH[bg_idxH]
+		while len(bg_strain30H)>len(bg_strain30L):
+                  bg_strain30H = np.delete(bg_strain30H,-1)
+                while len(bg_strain30H)<len(bg_strain30L):
+                  bg_strain30L = np.delete(bg_strain30L,-1)
+                bg_strainprod[j][i] = np.dot(bg_strain30H,bg_strain30L)
 
 
 #---------------------------
@@ -170,12 +176,15 @@ for j in range(len(background_intervals)):
 # 	siggroup.create_dataset('Strain'+str(i),data=strainprod[i])
 
 outdir='/scratch/spxha/'+str(starttime)+'_'+str(endtime)
+bg_group = [[0] for _ in range(len(background_intervals))]
 if os.path.exists(outdir)==True:
+        print "True"
 	outputf = h5py.File(outdir+'/'+str(starttime)+'.hdf5','r+')
 	for j in range(len(background_intervals)):
-		bg_group = outputf.create_group('Background'+str(j))
-		for i in range(len(bg_strainprod)):
-			backgroundset = bg_group.create_dataset('Strain'+str(i),data=bg_strainprod[i])
+		bg_group[j] = outputf.create_group('Background'+str(j))
+		for i in range(numseg30):
+			print i
+			bg_group[j].create_dataset('Strain'+str(i),data=bg_strainprod[j][i])
 else:
 	pass
 
