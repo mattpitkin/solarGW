@@ -1,7 +1,7 @@
 universe=vanilla
 getenv=True
-executable= /home/spxha/batchstrain.py
-arguments = '--framesL1 --framedH1 --start $(starttime)'
+executable= /home/spxha/batchstrain_bg.py
+arguments = --start $(starttime) --end $(endtime)
 log = /home/spxha/log.txt
 output = /home/spxha/out.txt
 error = /home/spxha/error.txt

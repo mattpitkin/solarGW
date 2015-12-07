@@ -1027,28 +1027,26 @@ VARS 513 starttime="971387354" endtime="971397690"
 JOB 514 testjob.sub
 VARS 514 starttime="971398339" endtime="971400243"
 JOB 515 testjob.sub
-VARS 515 starttime="971401223" endtime="971403461"
+VARS 515 starttime="971405860" endtime="971408038"
 JOB 516 testjob.sub
-VARS 516 starttime="971405860" endtime="971408038"
+VARS 516 starttime="971408697" endtime="971411575"
 JOB 517 testjob.sub
-VARS 517 starttime="971408697" endtime="971411575"
+VARS 517 starttime="971412994" endtime="971413194"
 JOB 518 testjob.sub
-VARS 518 starttime="971412994" endtime="971413194"
+VARS 518 starttime="971414006" endtime="971414815"
 JOB 519 testjob.sub
-VARS 519 starttime="971414006" endtime="971414815"
+VARS 519 starttime="971415594" endtime="971427311"
 JOB 520 testjob.sub
-VARS 520 starttime="971415594" endtime="971427311"
+VARS 520 starttime="971430972" endtime="971444098"
 JOB 521 testjob.sub
-VARS 521 starttime="971430972" endtime="971444098"
+VARS 521 starttime="971446579" endtime="971450805"
 JOB 522 testjob.sub
-VARS 522 starttime="971446579" endtime="971450805"
+VARS 522 starttime="971502047" endtime="971502100"
 JOB 523 testjob.sub
-VARS 523 starttime="971502047" endtime="971502100"
+VARS 523 starttime="971502328" endtime="971528027"
 JOB 524 testjob.sub
-VARS 524 starttime="971502328" endtime="971528027"
+VARS 524 starttime="971599454" endtime="971601677"
 JOB 525 testjob.sub
-VARS 525 starttime="971599454" endtime="971601677"
+VARS 525 starttime="971603367" endtime="971610678"
 JOB 526 testjob.sub
-VARS 526 starttime="971603367" endtime="971610678"
-JOB 527 testjob.sub
-VARS 527 starttime="971612815" endtime="971614889"
+VARS 526 starttime="971612815" endtime="971614889"
