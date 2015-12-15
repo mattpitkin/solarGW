@@ -14,7 +14,7 @@ backstrain, backj = [[[0] for _ in range(100)] for _ in range(2)]
 
 # Get upper limit
 for i in range(len(StartTimes)-1):
-	h5path =  'scratch/spxha/'+str(StartTimes[i])+'_'+str(EndTimes[i])
+	h5path =  '/scratch/spxha/'+str(StartTimes[i])+'_'+str(EndTimes[i])
 	if os.path.exists(h5path+'/'+str(StartTimes[i]+'.hdf5')):
 		durationi = EndTimes[i] - StartTimes[i]
 		if (durationi>180):
