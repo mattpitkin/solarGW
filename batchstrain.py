@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-#module load python/2.7.4-ligo
-#PYTHONPATH=/home/spxha/:$PYTHONPATH
-#PYTHONPATH=/home/spxha/.local/lib/python2.7/site-packages/:$PYTHONPATH
-#PYTHONPATH=/home/spxha/lib/python2.7/site-packages/:$PYTHONPATH
-
 #-----------------------
 # Import needed modules
 #-----------------------
@@ -21,6 +16,26 @@ import astropy
 from gwpy.timeseries import TimeSeries
 from scipy.signal import butter
 from scipy.signal import filtfilt
+
+#------------
+# Read macros
+#------------
+from optparse import OptionParser
+import sys
+parser = OptionParser()
+parser.add_option("--start", dest="starttime", type="int", help="Inputthe GPS start time for the analysis")
+parser.add_option("--end", dest="endtime", type="int", help="Input the GPS end time")
+(opts, args) = parser.parse_args() 
+if not opts.starttime:
+  print "Error... a '--start' option giving the GPS start time is required"
+  sys.exit(1)
+
+starttime = opts.starttime
+endtime = opts.endtime
+if starttime < 0 or np.isinf(starttime):
+  print "Error... the given start time is not valid"
+  sys.exit(1)
+
 #---------------
 # Read Timeseries
 #---------------
@@ -84,11 +99,11 @@ tgps = lal.LIGOTimeGPS(gpsStartH, 0)
 #---------------------------------------------------------
 # Get right ascension and declination of source in radians
 #---------------------------------------------------------
-# do this at every 30 seconds
+# do this every 30 seconds
 numseg30 = int((endtime-starttime)/30.)
 seg30 = gpsStartH + 30*np.linspace(1,numseg30,numseg30)
 tdelay = [[0] for _ in range(numseg30)]
-for i in range(numseg30):
+for i in range(numseg30-1):
         if ((timel[int(i/Xspacing)]>seg30[i])&(timel[int(i/Xspacing)]<seg30[i+1])):
 		coordstime=seg30[i]
 		coords = get_sun(Time.Time(coordstime,format='gps'))
@@ -104,38 +119,64 @@ tdelay = np.append(tdelay,b)
 timeL = timeL - tdelay
 
 # at this point timeH and timeL are synchronised
-#initialise idx, strain30L/H and strainprod
+# initialise idx, strain30L/H and strainprod
 overtsH = int(30/tsH)
 idxH,idxL,strain30L,strain30H = [[[0 for _ in range(overtsH)] for _ in range(numseg30)] for _ in range(4)]
 strainprod = [[0] for _ in range(numseg30)]
-for i in range(numseg30):
+for i in range(numseg30-1):
 	idxH[i] = np.where(np.logical_and(seg30[i]<timeH, seg30[i+1]>timeH))
-	print idxH
 	idxL[i] = np.where(np.logical_and(seg30[i]<timeL, seg30[i+1]>timeL))
 	strain30L[i] = strainL[idxL[i]]
 	strain30H[i] = strainH[idxH[i]]
-	print strain30L
 	strainprod[i] = np.dot(strain30H[i],strain30L[i])
 #---------------
 # Get Background
 #---------------
-background_intervals = np.linspace(1,120,120)*600
-ra_background, background_tdelay, dec_background, coords_background = [[[0] for _ in range(120)] for _ in range(4)]
+background_intervals = np.linspace(1,100,100)*60000
+ra_background, background_tdelay, dec_background, coords_background = [[[0] for _ in range(100)] for _ in range(4)]
 background_intervals = background_intervals.astype(int)
 for j in range(len(background_intervals)):
-	coords_background[j]=get_sun(Time.Time(gpsStartH-background_intervals[j],format='gps'))
-	ra_background[j]  = coords_background[j].ra.hour  * np.pi/12
-	dec_background[j] = coords_background[j].dec.hour * np.pi/12
-	background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background[j], dec_background[j], tgps)
+        coords_background[j] = get_sun(Time.Time(gpsStartH-background_intervals[j],format='gps'))
+        ra_background[j]     = coords_background[j].ra.hour  * np.pi/12
+        dec_background[j]    = coords_background[j].dec.hour * np.pi/12
+        background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background[j], dec_background[j], tgps)
 
+# initialise backtimeH and backtimeL                                                                              
+backtimeH, backtimeL = [[[0] for _ in range(100)] for _ in range(2)]
+for i in range(100):
+        backtimeH[i] = timeH
+        backtimeL[i] = timeL - background_tdelay[i]
+                                                                                                           
+bg_strainprod = [[[0] for _ in range(numseg30)] for _ in range(len(background_intervals))]
+for j in range(len(background_intervals)):
+        for i in range(numseg30-1):
+                bg_idxH = np.where(np.logical_and(seg30[i]<backtimeH[j], seg30[i+1]>backtimeH[j]))
+                bg_idxL = np.where(np.logical_and(seg30[i]<backtimeL[j], seg30[i+1]>backtimeL[j]))
+                bg_strain30L = strainL[bg_idxL[0]]
+                bg_strain30H = strainH[bg_idxH[0]]
+                while len(bg_strain30H)>len(bg_strain30L):
+                  bg_strain30H = np.delete(bg_strain30H,-1)
+                while len(bg_strain30H)<len(bg_strain30L):
+                  bg_strain30L = np.delete(bg_strain30L,-1)
+                bg_strainprod[j][i] = np.dot(bg_strain30H,bg_strain30L)
+print "SuccessA"
 #-------------------------------------------------------
 # Write output to hdf5 file
 #-------------------------------------------------------
-os.mkdir(outdir)
+bg_group = [[0] for _ in range(len(background_intervals))]
+outdir='/scratch/spxha/'+str(starttime)+'_'+str(endtime)
+if os.path.exists(outdir)==False:
+	os.mkdir(outdir)
+        print "SuccessB"
+else:
+	pass
 outputf = h5py.File(outdir+'/'+str(starttime)+'.hdf5','w')
 siggroup = outputf.create_group('Signal')
-backgroundgroup = outputf.create_group('Background')
-timesetH = siggroup.create_dataset('TimeSeries',data=timeH)
-# for i in range(len(strainprod)):
-siggroup.create_dataset('Strain',data=strainprod)
-backgroundset = backgroundgroup.create_dataset('tdelay',data=background_tdelay)
+siggroup.create_dataset('TimeSeries',data=timeH)
+for i in range(len(strainprod)):
+	siggroup.create_dataset('Strain'+str(i),data=strainprod[i])
+for j in range(len(background_intervals)):
+                bg_group[j] = outputf.create_group('Background'+str(j))
+                for i in range(numseg30):
+                        bg_group[j].create_dataset('Strain'+str(i),data=bg_strainprod[j][i])
+outputf.close()
