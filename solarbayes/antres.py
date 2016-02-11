@@ -52,3 +52,4 @@ def antenna_response( gpsTime, ra, dec, psi, det ):
       fp[i], fc[i] = lal.ComputeDetAMResponse(response, ra, dec, psi, gmst_rad)
 
     return fp, fc
+
