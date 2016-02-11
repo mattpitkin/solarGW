@@ -32,4 +32,17 @@ for i in range(numseg):
 #------ Creating lookup table -----#
 # psi = Jeffrey's prior?
 # det is practically either H1 or L1
-fp, fc = ant_res(gpsTime, ra, dec, psi, det):
+fp, fc = ant_res(segs, ra, dec, psi, det):
+
+
+#------- Write to hdf5 --------#
+time_dset = f.create_dataset(segs,'time')
+time_dset.attrs['Definition'] = "GPS Time"
+ra_dset = f.create_dataset(ra,'ra')
+ra_dset.attrs['Definition'] = "Right Ascension"
+dec_dset = f.create_dataset(dec,'dec')
+dec_dset.attrs['Definition'] = "Declination"
+fp_dset = f.create_dataset(fp,'fp')
+fp_dset.attrs['Definition'] = "Antenna Response - Plus Polarised"
+fc_dset = f.create_dataset(fc,'fc')
+fc_dset.attrs["Defintion"]="Antenna Response - Cross Polarised"
