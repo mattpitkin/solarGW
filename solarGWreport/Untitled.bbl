@@ -1,0 +1,84 @@
+\begin{thebibliography}{10}
+
+\bibitem{ligo}
+B.~P.~Abbott et~al. (LIGO Scientific~Collaboration).
+\newblock Ligo: the laser interferometer gravitational-wave observatory.
+\newblock {\em Reports on Progress in Physics}, 72(7):076901, 2009.
+
+\bibitem{kip}
+K.~S. Thorne.
+\newblock Gravitational-wave research: Current status and future prospects.
+\newblock {\em Review of Modern Physics}, 52:285--297, April 1980.
+
+\bibitem{sgwb}
+C.~Palomba; for~the LIGO Scientific~Collaboration and Virgo Collaboration.
+\newblock {Searches for continuous gravitational wave signals and stochastic
+  backgrounds in LIGO and Virgo data}.
+\newblock {\em ArXiv 1201.3176}, January 2012.
+
+\bibitem{LIGO:2012aa}
+J.~Abadie; et~al. (LIGO Scientific~Collaboration and Virgo Collaboration).
+\newblock {Sensitivity Achieved by the LIGO and Virgo Gravitational Wave
+  Detectors during LIGO's Sixth and Virgo's Second and Third Science Runs}.
+\newblock {\em ArXiv 1203.2674}, 2012.
+
+\bibitem{newplot}
+J.~Aasi; et~al. (LIGO Scientific~Collaboration and Virgo Collaboration.
+\newblock Characterization of the ligo detectors during their sixth science
+  run.
+\newblock {\em Classical and Quantum Gravity}, 32(11):115012, 2015.
+
+\bibitem{bh1}
+J.~Abadie; et~al (LIGO Scientific~Collaboration and Virgo Collaboration).
+\newblock Search for gravitational waves from low mass compact binary
+  coalescence in ligo's sixth science run and virgo's science runs 2 and 3.
+\newblock {\em Physical Review D}, 85:082002, April 2012.
+
+\bibitem{bh2}
+J.~Aasi; et~al (LIGO Scientific~Collaboration and Virgo Collaboration).
+\newblock Search for gravitational waves from binary black hole inspiral,
+  merger, and ringdown in ligo-virgo data from 2009\char21{}2010.
+\newblock {\em Physical Review D}, 87:022002, January 2013.
+
+\bibitem{supernovae}
+J.~Aasi; et~al. (LIGO Scientific~Collaboration and Virgo Collaboration).
+\newblock {Searches for Continuous Gravitational Waves from Nine Young
+  Supernova Remnants}.
+\newblock {\em Astrophysical Journal}, 813:39, November 2015.
+
+\bibitem{pulsars}
+J.~Aasi; et~al. (LIGO Scientific~Collaboration and Virgo Collaboration).
+\newblock Gravitational waves from known pulsars: Results from the initial
+  detector era.
+\newblock {\em Astrophysical Journal}, 785(2):119, 2014.
+
+\bibitem{sgwb2}
+J.~Aasi; et~al. (LIGO Scientific~Collaboration and Virgo Collaboration).
+\newblock Improved upper limits on the stochastic gravitational-wave background
+  from 2009\char21{}2010 ligo and virgo data.
+\newblock {\em Physical Review Letters}, 113:231101, December 2014.
+
+\bibitem{theory2}
+S.~L. Shapiro and S.~A. Teukolsky.
+\newblock {\em Black Holes, White Dwarfs and Neutron Stars: The Physics of
+  Compact Objects}.
+\newblock Wiley, 2008.
+
+\bibitem{sim2}
+Z.~B. Etienne, J.~A. Faber, Y.~T. Liu, S.~L. Shapiro, K.~Taniguchi, and T.~W.
+  Baumgarte.
+\newblock Fully general relativistic simulations of black hole-neutron star
+  mergers.
+\newblock {\em Physical Review D}, 77:084002, April 2008.
+
+\bibitem{sim}
+A.~Burrows, E.~Livne, L.~Dessart, C.~D. Ott, and J.~Murphy.
+\newblock A new mechanism for core-collapse supernova explosions.
+\newblock {\em Astrophysical Journal}, 640(2):878, 2006.
+
+\bibitem{winterberg}
+F.~{Winterberg}.
+\newblock {Emission of Gravitational Waves from a Magnetohydrodynamic Dynamo}.
+\newblock {\em ArXiv 1503.03003}, March 2015.
+
+\end{thebibliography}
