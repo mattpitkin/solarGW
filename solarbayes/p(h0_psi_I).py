@@ -7,13 +7,16 @@ import astropy.time as Time
 from gwpy.timeseries import TimeSeries
 from antres import antenna_response as ant_res
 
-sig_x = np.std()
-sig_y = np.std()
-sig_A = np.sttd()
+sigmaX = np.std()
+sigmaY = np.std()
+sigmaA = np.std()
 h0 = 3*sig_A
 
 Xspacing = 2.44140625E-4
 # for i in range(time/Xspacing):
+# Read FpL from LookupTable.hdf5
+# FpX, FcX =
+# FpY, FcY =
 
 # Finding probability distribution
 d = np.array([dX, dY])
