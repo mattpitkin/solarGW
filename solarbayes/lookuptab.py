@@ -11,11 +11,6 @@ from antres import antenna_response as ant_res
 f = h5py.File("/home/spxha/","w")
 
 #------- Define/workout variables -------#
-#for every 10 minutes, I was to create (sub-?)arrays of ra, dec,
-starttime=931219808
-endtime = 971614889
-dtime = endtime - starttime
-
 numseg = np.int((dtime)/600)
 segs = np.linspace(1,numseg,numseg)*600
 segs = segs + starttime - 600
