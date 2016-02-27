@@ -5,14 +5,10 @@
 #-----------------------
 from __future__ import division
 import numpy as np
-import os
+import os, lal, gwpy, h5py, lal, astropy
 import pylab as plt
-import gwpy
-import h5py
-import lal
 from astropy.coordinates import get_sun
 import astropy.time as Time
-import astropy
 from gwpy.timeseries import TimeSeries
 from scipy.signal import butter
 from scipy.signal import filtfilt
@@ -25,7 +21,7 @@ import sys
 parser = OptionParser()
 parser.add_option("--start", dest="starttime", type="int", help="Inputthe GPS start time for the analysis")
 parser.add_option("--end", dest="endtime", type="int", help="Input the GPS end time")
-(opts, args) = parser.parse_args() 
+(opts, args) = parser.parse_args()
 if not opts.starttime:
   print "Error... a '--start' option giving the GPS start time is required"
   sys.exit(1)
@@ -141,12 +137,12 @@ for j in range(len(background_intervals)):
         dec_background[j]    = coords_background[j].dec.hour * np.pi/12
         background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background[j], dec_background[j], tgps)
 
-# initialise backtimeH and backtimeL                                                                              
+# initialise backtimeH and backtimeL
 backtimeH, backtimeL = [[[0] for _ in range(100)] for _ in range(2)]
 for i in range(100):
         backtimeH[i] = timeH
         backtimeL[i] = timeL - background_tdelay[i]
-                                                                                                           
+
 bg_strainprod = [[[0] for _ in range(numseg30)] for _ in range(len(background_intervals))]
 for j in range(len(background_intervals)):
         for i in range(numseg30-1):
