@@ -4,18 +4,28 @@ import numpy as np
 import astropy, gwpy, h5py, lal
 from astropy.coordinates import get_sun
 import astropy.time as Time
+from scipy.signal import butter
+from scipy.signal import filtfilt
 from gwpy.timeseries import TimeSeries
 from antres import antenna_response as ant_res
 
 #-------- Filtering and timeshifting detectors --------#
-starttime = 931219808
-endtime   = 971614889
+starttime = 969062862
+endtime   = 969065629
 gpsStartH = starttime
 durationH = endtime - starttime
 gpsEndH   = endtime
 gpsStartL = gpsStartH
 durationL = durationH
 gpsEndL   = gpsEndH
+tsH = 2.44140625E-4
+tsL = 2.44140625E-4
+gpsTime = np.linspace(starttime,endtime,int(1/tsH))
+Xspacing = tsH
+pathtoinput = "/home/spxha/"
+strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
+strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
+
 #---------------------------
 # Applying a bandpass filter
 #---------------------------
@@ -54,6 +64,7 @@ numseg30 = int((endtime-starttime)/30.)
 seg30 = gpsStartH + 30*np.linspace(1,numseg30,numseg30)
 tdelay = [[0] for _ in range(numseg30)]
 for i in range(numseg30-1):
+	print i
         if ((timel[int(i/Xspacing)]>seg30[i])&(timel[int(i/Xspacing)]<seg30[i+1])):
 		coordstime=seg30[i]
 		coords = get_sun(Time.Time(coordstime,format='gps'))
@@ -87,31 +98,36 @@ psi_array = np.linspace(0,np.pi,10)
 sigmaX = np.std(strainH) # just std of strainH1
 sigmaY = np.std(strainL) # std of strainL!
 sigmaA = 10.0
-h0 = np.lin(0,3*sigmaA,10)
-invSigma0 = np.array([[(1./sigmaA**2) 0.], [0., (1./sigmaA**2)]])
+h0 = np.linspace(0,3*sigmaA,10)
+invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 detSigma0 = sigmaA**4
 dX = strainH
-dY = strainY
+dY = strainL
 
 ###########
 # Finding probability distribution
 # for psi in psi_array
-d, invC, detC, invSigma, detSigma, chi = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(6)]
+d, detC, detSigma, chi = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(4)]
+invC, invSigma = [[[0 for _ in range(2)] for _ in range(2)] for _ in range(2)]
+psi = np.pi/2.0
 for i in range(int(durationH/Xspacing)):
-	psi = np.pi/2.0
+	print i
 	FpX, FcX = ant_res(gpsTime[i], ra[i], dec[i], psi, 'H1')
 	FpY, FcY = ant_res(gpsTime[i], ra[i], dec[i], psi, 'L1')
-	d[i] = np.array([dX[i], dY][i])
-	M = h0*np.array([[FpX, FpY], [FcX, FcY]])
+	d[i] = np.array([[dX[i],0],[0, dY][i]])
+	M = h0[i+2]*np.array([[FpX, FpY], [FcX, FcY]])
 	C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 	invC[i] = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 	detC[i] = sigmaX**2 * sigmaY**2
+	print 'invC[i] is ... ',invC[i]
+	print 'invC is ... ',invC
+	print 'M is ... ',M
+	print 'invSigma0 is ... ',invSigma0
 	invSigma[i] = np.dot(M.T, np.dot(invC[i], M)) + invSigma0
 	Sigma = np.linalg.inv(invSigma[i])
 	detSigma[i] = np.linalg.det(Sigma)
 	chi[i] = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
-p = 0.5*np.log(detSigma) - 0.5*log(16.*np.pi**4*detSigma0*detC) -
-    0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
+p = 0.5*np.log(detSigma) - 0.5*log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 
 #------ plot the probability distribution
 fname = 'probdist.pdf'
