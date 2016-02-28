@@ -12,7 +12,7 @@ from antres import antenna_response as ant_res
 ################################################################
 #-------- Importing, filtering and timeshifting data ----------#
 starttime = 969062862
-endtime   = 969065629
+endtime   = 969063629
 gpsStartH = starttime
 durationH = endtime - starttime
 gpsEndH   = endtime
@@ -70,10 +70,12 @@ timeL = timeL - tdelay
 
 #------- Defining some stuff for p ------#
 numseg = int((durationH)/600)
+print numseg
 segs = np.linspace(1,numseg,numseg)*600
 segs = segs + starttime - 600
 ra,dec,fp,fc = [[0 for _ in range(numseg)] for _ in range(4)]
 for i in range(numseg):
+	print i
 	coordstime = segs[i]
 	coords = get_sun(Time.Time(coordstime,format='gps'))
 	ra[i] = coords.ra.hour*np.pi/12
@@ -101,22 +103,24 @@ invC, invSigma = [[[[0 for _ in range(2)] for _ in range(2)] for _ in range(int(
 psi = np.pi/2.0
 for i in range(int(durationH/Xspacing)):
 	print i
-	FpX, FcX = ant_res(gpsTime[i], ra[i], dec[i], psi, 'H1')
-	FpY, FcY = ant_res(gpsTime[i], ra[i], dec[i], psi, 'L1')
+	FpX, FcX = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], psi, 'H1')
+	FpY, FcY = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], psi, 'L1')
+	FpX = FpX[0]
+	FcX = FcX[0]
+	FpY = FpY[0]
+	FcY = FcY[0]
+	print 'FpX is ...',FpX
 	d[i] = np.array([dX[i], dY[i]])
 	d[i].shape = (2,1)
 	M = h0*np.array([[FpX, FpY], [FcX, FcY]])
 	C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 	invC[i] = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 	detC[i] = sigmaX**2 * sigmaY**2
-	print 'invC[i] is ... ',invC[i]
-	print 'M is ... ',M
-	print 'invSigma0 is ... ',invSigma0
 	invSigma[i] = np.dot(M.T, np.dot(invC[i], M)) + invSigma0
 	print 'invSigma[i] is ...',invSigma[i]
 	Sigma = np.linalg.inv(invSigma[i])
 	detSigma[i] = np.linalg.det(Sigma)
-	chi[i] = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
+	chi[i] = np.dot(Sigma, np.dot(M.T, np.dot(invC[i], d[i])))
 p = 0.5*np.log(detSigma) - 0.5*log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 
 #------ plot the probability distribution
