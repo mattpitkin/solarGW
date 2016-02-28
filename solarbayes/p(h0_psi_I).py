@@ -95,25 +95,25 @@ dY = strainL
 ###########
 # Finding probability distribution
 # for psi in psi_array
-detC, detSigma, chi = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(4)]
-d = [[0 for _ in range(2)] for _ in range(durationH/Xspacing)]
-invC, invSigma = [[[[0 for _ in range(2)] for _ in range(2)] for _ in range(durationH/Xspacing)] for _ in range(2)]
+detC, detSigma, chi = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(3)]
+d = [[0 for _ in range(2)] for _ in range(int(durationH/Xspacing))]
+invC, invSigma = [[[[0 for _ in range(2)] for _ in range(2)] for _ in range(int(durationH/Xspacing))] for _ in range(2)]
 psi = np.pi/2.0
 for i in range(int(durationH/Xspacing)):
 	print i
 	FpX, FcX = ant_res(gpsTime[i], ra[i], dec[i], psi, 'H1')
 	FpY, FcY = ant_res(gpsTime[i], ra[i], dec[i], psi, 'L1')
-	d[i] = np.array([dX[i], dY[i])
+	d[i] = np.array([dX[i], dY[i]])
 	d[i].shape = (2,1)
 	M = h0*np.array([[FpX, FpY], [FcX, FcY]])
 	C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 	invC[i] = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 	detC[i] = sigmaX**2 * sigmaY**2
 	print 'invC[i] is ... ',invC[i]
-	print 'invC is ... ',invC
 	print 'M is ... ',M
 	print 'invSigma0 is ... ',invSigma0
 	invSigma[i] = np.dot(M.T, np.dot(invC[i], M)) + invSigma0
+	print 'invSigma[i] is ...',invSigma[i]
 	Sigma = np.linalg.inv(invSigma[i])
 	detSigma[i] = np.linalg.det(Sigma)
 	chi[i] = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
