@@ -9,7 +9,8 @@ from scipy.signal import filtfilt
 from gwpy.timeseries import TimeSeries
 from antres import antenna_response as ant_res
 
-#-------- Filtering and timeshifting detectors --------#
+################################################################
+#-------- Importing, filtering and timeshifting data ----------#
 starttime = 969062862
 endtime   = 969065629
 gpsStartH = starttime
@@ -18,10 +19,8 @@ gpsEndH   = endtime
 gpsStartL = gpsStartH
 durationL = durationH
 gpsEndL   = gpsEndH
-tsH = 2.44140625E-4
-tsL = 2.44140625E-4
-gpsTime = np.linspace(starttime,endtime,int(1/tsH))
-Xspacing = tsH
+Xspacing = 2.44140625E-4
+gpsTime = np.linspace(starttime,endtime,int(1/Xspacing))
 pathtoinput = "/home/spxha/"
 strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
 strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
@@ -36,32 +35,19 @@ bL,aL = butter(ord,Wn, btype=type)
 bH,aH = butter(ord,Wn, btype=type)
 strainL = filtfilt(bL,aL,strainL)
 strainH = filtfilt(bH,aH,strainH)
-#---------------------------
-# Create a time vector
-#---------------------------
-timeH = np.arange(gpsStartH, gpsEndH, tsH)
-timeL = np.arange(gpsStartL, gpsEndL, tsL)
+
+timeH = np.arange(gpsStartH, gpsEndH, Xspacing)
+timeL = np.arange(gpsStartL, gpsEndL, Xspacing)
 timel=timeL
-#-----------------------------------------------
-# Create mapping between detector name and index
-#-----------------------------------------------
 detMap = {'H1': lal.LALDetectorIndexLHODIFF, 'L1':
 lal.LALDetectorIndexLLODIFF}
-#-------------------------------------
-# Get detector structure for H1 and L1
-#-------------------------------------
 detH1 = lal.CachedDetectors[detMap['H1']]
 detL1 = lal.CachedDetectors[detMap['L1']]
-#---------------
-# Set a GPS time
-#---------------
 tgps = lal.LIGOTimeGPS(gpsStartH, 0)
-#---------------------------------------------------------
-# Get right ascension and declination of source in radians
-#---------------------------------------------------------
-# do this every 30 seconds
+
+#---------- Get right ascension and declination of source in radians ----------#
 numseg30 = int((endtime-starttime)/30.)
-seg30 = gpsStartH + 30*np.linspace(1,numseg30,numseg30)
+seg30 = gpsStartH + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
 tdelay = [[0] for _ in range(numseg30)]
 for i in range(numseg30-1):
 	print i
@@ -71,9 +57,10 @@ for i in range(numseg30-1):
 		tdelay[i] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
 	else:
 		pass
-tdelay = np.repeat(tdelay,int(30/tsH))
+tdelay = np.repeat(tdelay,int(30/Xspacing))
 
 # make sure tdelay and timeL are of same length in case integer-ing caused slight inconsistency.
+
 b = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
 tdelay = np.append(tdelay,b)
 
@@ -95,10 +82,11 @@ psi_array = np.linspace(0,np.pi,10)
 
 # X is H1 and Y is L1
 
-sigmaX = np.std(strainH) # just std of strainH1
-sigmaY = np.std(strainL) # std of strainL!
+sigmaX = np.std(strainH)
+sigmaY = np.std(strainL)
 sigmaA = 10.0
-h0 = np.linspace(0,3*sigmaA,10)
+# h0 = np.linspace(0,3*sigmaA,10)
+h0 = 3*sigmaA
 invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 detSigma0 = sigmaA**4
 dX = strainH
@@ -107,15 +95,17 @@ dY = strainL
 ###########
 # Finding probability distribution
 # for psi in psi_array
-d, detC, detSigma, chi = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(4)]
-invC, invSigma = [[[0 for _ in range(2)] for _ in range(2)] for _ in range(2)]
+detC, detSigma, chi = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(4)]
+d = [[0 for _ in range(2)] for _ in range(durationH/Xspacing)]
+invC, invSigma = [[[[0 for _ in range(2)] for _ in range(2)] for _ in range(durationH/Xspacing)] for _ in range(2)]
 psi = np.pi/2.0
 for i in range(int(durationH/Xspacing)):
 	print i
 	FpX, FcX = ant_res(gpsTime[i], ra[i], dec[i], psi, 'H1')
 	FpY, FcY = ant_res(gpsTime[i], ra[i], dec[i], psi, 'L1')
-	d[i] = np.array([[dX[i],0],[0, dY][i]])
-	M = h0[i+2]*np.array([[FpX, FpY], [FcX, FcY]])
+	d[i] = np.array([dX[i], dY[i])
+	d[i].shape = (2,1)
+	M = h0*np.array([[FpX, FpY], [FcX, FcY]])
 	C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 	invC[i] = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 	detC[i] = sigmaX**2 * sigmaY**2
