@@ -74,7 +74,7 @@ print numseg
 segs = np.linspace(1,numseg,numseg)*600
 segs = segs + starttime - 600
 ra,dec,fp,fc = [[0 for _ in range(numseg)] for _ in range(4)]
-for i in range(numseg):
+for i in range(numseg+1):
 	print i
 	coordstime = segs[i]
 	coords = get_sun(Time.Time(coordstime,format='gps'))
@@ -84,44 +84,41 @@ psi_array = np.linspace(0,np.pi,10)
 
 # X is H1 and Y is L1
 
-sigmaX = np.std(strainH)
-sigmaY = np.std(strainL)
 sigmaA = 10.0
-# h0 = np.linspace(0,3*sigmaA,10)
-h0 = 3*sigmaA
+h0_array = np.linspace(0,3*sigmaA,25)
 invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 detSigma0 = sigmaA**4
 dX = strainH
 dY = strainL
-
-###########
+##################################
 # Finding probability distribution
 # for psi in psi_array
-detC, detSigma, chi = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(3)]
-d = [[0 for _ in range(2)] for _ in range(int(durationH/Xspacing))]
-invC, invSigma = [[[[0 for _ in range(2)] for _ in range(2)] for _ in range(int(durationH/Xspacing))] for _ in range(2)]
-psi = np.pi/2.0
-for i in range(int(durationH/Xspacing)):
-	print i
-	FpX, FcX = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], psi, 'H1')
-	FpY, FcY = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], psi, 'L1')
-	FpX = FpX[0]
-	FcX = FcX[0]
-	FpY = FpY[0]
-	FcY = FcY[0]
-	print 'FpX is ...',FpX
-	d[i] = np.array([dX[i], dY[i]])
-	d[i].shape = (2,1)
-	M = h0*np.array([[FpX, FpY], [FcX, FcY]])
-	C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
-	invC[i] = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
-	detC[i] = sigmaX**2 * sigmaY**2
-	invSigma[i] = np.dot(M.T, np.dot(invC[i], M)) + invSigma0
-	print 'invSigma[i] is ...',invSigma[i]
-	Sigma = np.linalg.inv(invSigma[i])
-	detSigma[i] = np.linalg.det(Sigma)
-	chi[i] = np.dot(Sigma, np.dot(M.T, np.dot(invC[i], d[i])))
-p = 0.5*np.log(detSigma) - 0.5*log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
+p = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(3)]
+for k in range(len(psi_array)):
+	for j in range(len(h0_array)):
+		for i in range(int(durationH/Xspacing)):
+			print i
+			int0 = i - int(30/Xspacing)
+			int1 = i + int(30/Xspacing)
+			sigmaX = np.std(strainH[int0:int1])
+			sigmaY = np.std(strainL[int0:int1])
+			FpX, FcX = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], psi_array[k], 'H1')
+			FpY, FcY = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], psi_array[k], 'L1')
+			FpX = FpX[0]
+			FcX = FcX[0]
+			FpY = FpY[0]
+			FcY = FcY[0]
+			d = np.array([dX, dY])
+			d.shape = (2,1)
+			M = h0_array[j]*np.array([[FpX, FpY], [FcX, FcY]])
+			C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
+			invC = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
+			detC = sigmaX**2 * sigmaY**2
+			invSigma = np.dot(M.T, np.dot(invC, M)) + invSigma0
+			Sigma = np.linalg.inv(invSigma)
+			detSigma = np.linalg.det(Sigma)
+			chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
+			p[k][j][i] = 0.5*np.log(detSigma) - 0.5*log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 
 #------ plot the probability distribution
 fname = 'probdist.pdf'
