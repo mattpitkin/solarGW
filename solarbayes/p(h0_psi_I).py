@@ -68,6 +68,8 @@ timeL = timeL - tdelay
 
 # H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
+####################################
+# Finding probability distribution #
 #------- Defining some stuff for p ------#
 numseg = int((durationH)/600)
 print numseg
@@ -85,29 +87,32 @@ psi_array = np.linspace(0,np.pi,10)
 # X is H1 and Y is L1
 
 sigmaA = 10.0
-h0_array = np.linspace(0,3*sigmaA,25)
+h0_array = np.linspace(0,3*sigmaX,25)
 invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 detSigma0 = sigmaA**4
 dX = strainH
 dY = strainL
-##################################
-# Finding probability distribution
-# for psi in psi_array
-p = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(3)]
-for k in range(len(psi_array)):
-	for j in range(len(h0_array)):
+FcX, FpX, FcY, FpY = [[0 for _ in range(int(duration/Xspacing))] for _ in range(4)]
+for i in range(int(duration/Xspacing)):
+	FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
+	FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
+
+
+p = [[[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(psi_array))] for _ in range(len(h0_array))]
+for j in range(len(h0_array)):
+	for k in range(len(psi_array)):
 		for i in range(int(durationH/Xspacing)):
 			print i
+			cos2pi = np.cos(2*psi_array[i])
+			sin2pi = np.sin(2*psi_array[i])
+			FpX = FpX0[i]*cos2pi + FcX0[i]*sin2pi
+			FcX = FcX0[i]*cos2pi - FpX0[i]*sin2pi
+			FpY = FpY0[i]*cos2pi + FcY0[i]*sin2pi
+			FcY = FcY0[i]*cos2pi - FpY0[i]*sin2pi
 			int0 = i - int(30/Xspacing)
 			int1 = i + int(30/Xspacing)
 			sigmaX = np.std(strainH[int0:int1])
 			sigmaY = np.std(strainL[int0:int1])
-			FpX, FcX = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], psi_array[k], 'H1')
-			FpY, FcY = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], psi_array[k], 'L1')
-			FpX = FpX[0]
-			FcX = FcX[0]
-			FpY = FpY[0]
-			FcY = FcY[0]
 			d = np.array([dX, dY])
 			d.shape = (2,1)
 			M = h0_array[j]*np.array([[FpX, FpY], [FcX, FcY]])
