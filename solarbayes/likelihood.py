@@ -69,12 +69,10 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	tdelay = np.repeat(tdelay,int(30/Xspacing))
 
 	# make sure tdelay and timeL are of same length in case integer-ing caused slight inconsistency.
-
 	b = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
 	tdelay = np.append(tdelay,b)
 
 	timeL = timeL - tdelay
-
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
 	####################################
