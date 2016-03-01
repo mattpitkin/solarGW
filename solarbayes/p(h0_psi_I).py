@@ -8,6 +8,7 @@ from scipy.signal import butter
 from scipy.signal import filtfilt
 from gwpy.timeseries import TimeSeries
 from antres import antenna_response as ant_res
+from scipy.misc import logsumexp
 
 ################################################################
 #-------- Importing, filtering and timeshifting data ----------#
@@ -83,9 +84,7 @@ for i in range(numseg+1):
 	ra[i] = coords.ra.hour*np.pi/12
 	dec[i] = coords.dec.hour*np.pi/12
 psi_array = np.linspace(0,np.pi,10)
-
-# X is H1 and Y is L1
-
+dpsi = psi_array[1]-psi_array[0]
 sigmaA = 10.0
 h0_array = np.linspace(0,3*sigmaX,25)
 invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
@@ -96,12 +95,14 @@ FcX, FpX, FcY, FpY = [[0 for _ in range(int(duration/Xspacing))] for _ in range(
 for i in range(int(duration/Xspacing)):
 	FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
 	FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
+p = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(h0_array))]
+ppsis = [0 for _ in rannge(len(psi_array))]
+logdpsi_2 = np.log(0.5*dpsi)
+# p = [[[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(psi_array))] for _ in range(len(h0_array))]
 
-
-p = [[[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(psi_array))] for _ in range(len(h0_array))]
-for j in range(len(h0_array)):
-	for k in range(len(psi_array)):
-		for i in range(int(durationH/Xspacing)):
+for i in range(int(durationH/Xspacing)):
+	for j in range(len(h0_array)):
+		for k in range(len(psi_array)):
 			print i
 			cos2pi = np.cos(2*psi_array[i])
 			sin2pi = np.sin(2*psi_array[i])
@@ -123,13 +124,14 @@ for j in range(len(h0_array)):
 			Sigma = np.linalg.inv(invSigma)
 			detSigma = np.linalg.det(Sigma)
 			chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
-			p[k][j][i] = 0.5*np.log(detSigma) - 0.5*log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
+			ppsi[k]    = 0.5*np.log(detSigma) - 0.5*log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
+		p[j][i] = logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
 
 #------ plot the probability distribution
 fname = 'probdist.pdf'
 with PdfPages(fname) as pdf:
 	fig1 = plt.figure()
-	plt.plot(h0,p)
+	plt.plot(p[1],p[0],',')
 	plt.title('Probability Distribution')
 	pdf.savefig(fig1)
 	plt.close()
