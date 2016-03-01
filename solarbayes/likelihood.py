@@ -100,14 +100,13 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	detSigma0 = sigmaA**4
 	dX = strainH
 	dY = strainL
-	FcX, FpX, FcY, FpY = [[0 for _ in range(int(duration/Xspacing))] for _ in range(4)]
-	for i in range(int(duration/Xspacing)):
+	FcX, FpX, FcY, FpY = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(4)]
+	for i in range(int(durationH/Xspacing)):
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
 		FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
 	p = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(h0_array))]
 	ppsis = [0 for _ in rannge(len(psi_array))]
 	logdpsi_2 = np.log(0.5*dpsi)
-	# p = [[[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(psi_array))] for _ in range(len(h0_array))]
 
 	pbar = ProgressBar(widgets=widgets, maxval=int(durationH/Xspacing)-1)
 	pbar.start()
