@@ -76,7 +76,7 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	####################################
 	# Finding probability distribution #
 	#------- Defining some stuff for p ------#
-	'Finding likelihood'
+	print 'Finding likelihood'
 	numseg = int((durationH)/600)
 	segs = np.linspace(0,numseg,numseg+1)*600
 	segs = segs + starttime
@@ -102,6 +102,7 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	ppsis = [0 for _ in range(len(psi_array))]
 	logdpsi_2 = np.log(0.5*dpsi)
 
+	print 'Finding Likelihoot Part 2'
 	pbar = ProgressBar(widgets=widgets, max_value=int(durationH/Xspacing)-1)
 	pbar.start()
 	for i in range(int(durationH/Xspacing)):
@@ -119,15 +120,11 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 				sigmaY = np.std(strainL[int0:int1])
 				d = np.array([dX[i], dY[i]])
 				d.shape = (2,1)
-				print h0_array[j]
-				print FpX
 				M = h0_array[j]*np.array([[FpX, FpY], [FcX, FcY]])
-				print M
 				C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 				invC = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 				detC = sigmaX**2 * sigmaY**2
 				invSigma = np.dot(M.T, np.dot(invC, M)) + invSigma0
-				print invSigma
 				Sigma = np.linalg.inv(invSigma)
 				detSigma = np.linalg.det(Sigma)
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
