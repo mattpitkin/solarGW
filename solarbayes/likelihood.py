@@ -1,4 +1,4 @@
-def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=25):
+def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=25):
 	#------- Packages ---------#
 	import numpy as np
 	import astropy, gwpy, h5py, lal
@@ -17,8 +17,6 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	################################################################
 	#-------- Importing, filtering and timeshifting data ----------#
 	print 'Reading data'
-# 	starttime = 969062862
-# 	endtime   = 969063629
 	gpsStartH = starttime
 	durationH = endtime - starttime
 	gpsEndH   = endtime
@@ -89,7 +87,7 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	psi_array = np.linspace(0,np.pi,10)
 	dpsi = psi_array[1]-psi_array[0]
 	sigmaA = 10.0
-	h0_array = np.linspace(0.001*std(strainH),h0_factor*np.std(strainH),h0_vals_num)
+	h0_array = np.linspace(0.001*np.std(strainH),h0_factor*np.std(strainH),h0_vals_num)
 	invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 	detSigma0 = sigmaA**4
 	dX = strainH
@@ -99,28 +97,36 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
 		FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
 	p = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(h0_array))]
-	ppsis = [0 for _ in range(len(psi_array))]
+	ppsi = [0 for _ in range(len(psi_array))]
 	logdpsi_2 = np.log(0.5*dpsi)
 
 	print 'Finding Likelihoot Part 2'
 	pbar = ProgressBar(widgets=widgets, max_value=int(durationH/Xspacing)-1)
 	pbar.start()
 	for i in range(int(durationH/Xspacing)):
+		print i
 		for j in range(len(h0_array)):
 			for k in range(len(psi_array)):
-				cos2pi = np.cos(2*psi_array[i])
-				sin2pi = np.sin(2*psi_array[i])
+				cos2pi = np.cos(2*psi_array[k])
+				sin2pi = np.sin(2*psi_array[k])
 				FpX = FpX0[i]*cos2pi + FcX0[i]*sin2pi
 				FcX = FcX0[i]*cos2pi - FpX0[i]*sin2pi
 				FpY = FpY0[i]*cos2pi + FcY0[i]*sin2pi
 				FcY = FcY0[i]*cos2pi - FpY0[i]*sin2pi
-				int0 = i - int(30/Xspacing)
-				int1 = i + int(30/Xspacing)
+				if (i + int(60/Xspacing)<int(durationH/Xspacing)):
+					int1 = i + int(60/Xspacing)
+				else:
+					int1 = i
+				if (i - int(60/Xspacing)>0):
+					int1 = i - int(60/Xspacing)
+				else:
+					int0 = 0
 				sigmaX = np.std(strainH[int0:int1])
 				sigmaY = np.std(strainL[int0:int1])
 				d = np.array([dX[i], dY[i]])
 				d.shape = (2,1)
 				M = h0_array[j]*np.array([[FpX, FpY], [FcX, FcY]])
+				M = np.array([[M[0][0][0],M[0][1][0]],[M[1][0][0], M[1][1][0]]])
 				C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 				invC = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 				detC = sigmaX**2 * sigmaY**2
@@ -128,11 +134,17 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 				Sigma = np.linalg.inv(invSigma)
 				detSigma = np.linalg.det(Sigma)
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
-				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
+				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*np.log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 			p[j][i] = logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
 		pbar.update(i)
 	pbar.finish()
 	print
+
+	# Write into an hdf5 file just in case
+	f = h5py.File('/home/spxha/probability.hdf5','w')
+	h0_dset = f.create_dataset(h0_array,'h0')
+	for i in range(len(h0_array)):
+		f.create_dataset(p[i],'p'+str(i))
 	#------ plot the probability distribution
 	print 'Producing Plot'
 	fname = 'probdist.pdf'
