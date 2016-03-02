@@ -71,10 +71,10 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	timeL = timeL - tdelay
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
-	####################################
-	# Finding probability distribution #
+	############################################################
+	#------------ Finding probability distribution ------------#
 	#------- Defining some stuff for p ------#
-	print 'Finding likelihood'
+	print 'Finding likelihood Part 1/2'
 	numseg = int((durationH)/600)
 	segs = np.linspace(0,numseg,numseg+1)*600
 	segs = segs + starttime
@@ -111,7 +111,7 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
 
-	print 'Finding Likelihoot Part 2'
+	print 'Finding likelihoot Part 2/2. This will take a while... '
 	pbar = ProgressBar(widgets=widgets, max_value=int(durationH/Xspacing)-1)
 	pbar.start()
 	for i in range(int(durationH/Xspacing)):
@@ -122,7 +122,7 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 		else:
 			int1 = i
 		if (i - int(60/Xspacing)>0):
-			int1 = i - int(60/Xspacing)
+			int0 = i - int(60/Xspacing)
 		else:
 			int0 = 0
 		sigmaX = np.std(strainH[int0:int1])
