@@ -28,7 +28,7 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	pathtoinput = "/home/spxha/"
 	strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
 	strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
-
+	num_points = int(durationH/Xspacing)
 	#---------------------------
 	# Applying a bandpass filter
 	#---------------------------
@@ -92,8 +92,8 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	detSigma0 = sigmaA**4
 	dX = strainH
 	dY = strainL
-	FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(4)]
-	for i in range(int(durationH/Xspacing)):
+	FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(num_points)] for _ in range(4)]
+	for i in range(num_points):
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
 		FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
 	p = [0  for _ in range(len(h0_array))]
@@ -101,23 +101,23 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	logdpsi_2 = np.log(0.5*dpsi)
 
 	cos2pi, sin2pi = [[0 for _ in range(len(psi_array))] for _ in range(2)]
-	FpX, FcX, FpY, FcY = [[[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(psi_array))] for _ in range(4)]
+	FpX, FcX, FpY, FcY = [[[0 for _ in range(num_points)] for _ in range(len(psi_array))] for _ in range(4)]
 	for k in range(len(psi_array)):
 		cos2pi[k] = np.cos(2*psi_array[k])
 		sin2pi[k] = np.sin(2*psi_array[k])
-		for i in range(int(durationH/Xspacing)):
+		for i in range(num_points):
 			FpX[k][i] = FpX0[i]*cos2pi[k] + FcX0[i]*sin2pi[k]
 			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
 
 	print 'Finding likelihoot Part 2/2. This will take a while... '
-	pbar = ProgressBar(widgets=widgets, max_value=int(durationH/Xspacing)-1)
+	pbar = ProgressBar(widgets=widgets, max_value=num_points-1)
 	pbar.start()
-	for i in range(int(durationH/Xspacing)):
+	for i in range(num_points):
 		d = np.array([dX[i], dY[i]])
 		d.shape = (2,1)
-		if (i + int(60/Xspacing)<int(durationH/Xspacing)):
+		if (i + int(60/Xspacing)<num_points):
 			int1 = i + int(60/Xspacing)
 		else:
 			int1 = i
