@@ -100,12 +100,12 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	ppsi = [0 for _ in range(len(psi_array))]
 	logdpsi_2 = np.log(0.5*dpsi)
 
-	cos2pi, sin2pi = [[0 for _ in range(psi_array)] for _ in range(2)]
-	FpX, FcX, FpY, FcY = [[[ ]]]
-	for k in range(len(h0_array)):
+	cos2pi, sin2pi = [[0 for _ in range(len(psi_array))] for _ in range(2)]
+	FpX, FcX, FpY, FcY = [[[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(psi_array))] for _ in range(4)]
+	for k in range(len(psi_array)):
 		cos2pi[k] = np.cos(2*psi_array[k])
 		sin2pi[k] = np.sin(2*psi_array[k])
-		for i in range():
+		for i in range(int(durationH/Xspacing)):
 			FpX[k][i] = FpX0[i]*cos2pi[k] + FcX0[i]*sin2pi[k]
 			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
@@ -144,7 +144,7 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	pbar.finish()
 	print
 
-	# Write into a file
+	# Write into a file.
 	f = h5py.File('/home/spxha/probability.hdf5','w')
 	f.create_dataset(h0_array,'h0')
 	f.create_dataset(p,'p')
