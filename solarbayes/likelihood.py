@@ -100,36 +100,40 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	ppsi = [0 for _ in range(len(psi_array))]
 	logdpsi_2 = np.log(0.5*dpsi)
 
+	cos2pi, sin2pi = [[0 for _ in range(psi_array)] for _ in range(2)]
+	FpX, FcX, FpY, FcY = [[[ ]]]
+	for k in range(len(h0_array)):
+		cos2pi[k] = np.cos(2*psi_array[k])
+		sin2pi[k] = np.sin(2*psi_array[k])
+		for i in range():
+			FpX[k][i] = FpX0[i]*cos2pi[k] + FcX0[i]*sin2pi[k]
+			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
+			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
+			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
+
 	print 'Finding Likelihoot Part 2'
 	pbar = ProgressBar(widgets=widgets, max_value=int(durationH/Xspacing)-1)
 	pbar.start()
 	for i in range(int(durationH/Xspacing)):
-		print i
+		d = np.array([dX[i], dY[i]])
+		d.shape = (2,1)
+		if (i + int(60/Xspacing)<int(durationH/Xspacing)):
+			int1 = i + int(60/Xspacing)
+		else:
+			int1 = i
+		if (i - int(60/Xspacing)>0):
+			int1 = i - int(60/Xspacing)
+		else:
+			int0 = 0
+		sigmaX = np.std(strainH[int0:int1])
+		sigmaY = np.std(strainL[int0:int1])
+		C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
+		invC = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
+		detC = sigmaX**2 * sigmaY**2
 		for j in range(len(h0_array)):
 			for k in range(len(psi_array)):
-				cos2pi = np.cos(2*psi_array[k])
-				sin2pi = np.sin(2*psi_array[k])
-				FpX = FpX0[i]*cos2pi + FcX0[i]*sin2pi
-				FcX = FcX0[i]*cos2pi - FpX0[i]*sin2pi
-				FpY = FpY0[i]*cos2pi + FcY0[i]*sin2pi
-				FcY = FcY0[i]*cos2pi - FpY0[i]*sin2pi
-				if (i + int(60/Xspacing)<int(durationH/Xspacing)):
-					int1 = i + int(60/Xspacing)
-				else:
-					int1 = i
-				if (i - int(60/Xspacing)>0):
-					int1 = i - int(60/Xspacing)
-				else:
-					int0 = 0
-				sigmaX = np.std(strainH[int0:int1])
-				sigmaY = np.std(strainL[int0:int1])
-				d = np.array([dX[i], dY[i]])
-				d.shape = (2,1)
-				M = h0_array[j]*np.array([[FpX, FpY], [FcX, FcY]])
+				M = h0_array[j]*np.array([[FpX[k][i], FpY[k][i]], [FcX[k][i], FcY[k][i]]])
 				M = np.array([[M[0][0][0],M[0][1][0]],[M[1][0][0], M[1][1][0]]])
-				C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
-				invC = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
-				detC = sigmaX**2 * sigmaY**2
 				invSigma = np.dot(M.T, np.dot(invC, M)) + invSigma0
 				Sigma = np.linalg.inv(invSigma)
 				detSigma = np.linalg.det(Sigma)
@@ -142,14 +146,15 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 
 	# Write into a file
 	f = h5py.File('/home/spxha/probability.hdf5','w')
-	h0_dset = f.create_dataset(h0_array,'h0')
+	f.create_dataset(h0_array,'h0')
 	f.create_dataset(p,'p')
+
 	#------ plot the probability distribution
 	print 'Producing Plot'
 	fname = 'probdist.pdf'
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
-		plt.plot(h0_array,p,',')
+		plt.plot(h0_array,p,'+')
 		plt.title('Probability Distribution')
 		pdf.savefig(fig1)
 		plt.close()
