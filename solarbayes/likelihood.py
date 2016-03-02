@@ -1,6 +1,5 @@
 def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=25):
 	#------- Packages ---------#
-	from __future__ import division
 	import numpy as np
 	import astropy, gwpy, h5py, lal
 	from astropy.coordinates import get_sun
@@ -59,8 +58,7 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	seg30 = gpsStartH + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
 	tdelay = [[0] for _ in range(numseg30)]
 	for i in range(numseg30-1):
-		print i
-			if ((timel[int(i/Xspacing)]>seg30[i])&(timel[int(i/Xspacing)]<seg30[i+1])):
+		if ((timel[int(i/Xspacing)]>seg30[i])&(timel[int(i/Xspacing)]<seg30[i+1])):
 			coordstime=seg30[i]
 			coords = get_sun(Time.Time(coordstime,format='gps'))
 			tdelay[i] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
@@ -80,12 +78,10 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	#------- Defining some stuff for p ------#
 	'Finding likelihood'
 	numseg = int((durationH)/600)
-	print numseg
-	segs = np.linspace(1,numseg,numseg)*600
-	segs = segs + starttime - 600
-	ra,dec,fp,fc = [[0 for _ in range(numseg)] for _ in range(4)]
+	segs = np.linspace(0,numseg,numseg+1)*600
+	segs = segs + starttime
+	ra,dec,fp,fc = [[0 for _ in range(numseg+1)] for _ in range(4)]
 	for i in range(numseg+1):
-		print i
 		coordstime = segs[i]
 		coords = get_sun(Time.Time(coordstime,format='gps'))
 		ra[i] = coords.ra.hour*np.pi/12
@@ -93,20 +89,20 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 	psi_array = np.linspace(0,np.pi,10)
 	dpsi = psi_array[1]-psi_array[0]
 	sigmaA = 10.0
-	h0_array = np.linspace(0,h0_factor*sigmaX,h0_vals_num)
+	h0_array = np.linspace(0.001*std(strainH),h0_factor*np.std(strainH),h0_vals_num)
 	invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 	detSigma0 = sigmaA**4
 	dX = strainH
 	dY = strainL
-	FcX, FpX, FcY, FpY = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(4)]
+	FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(4)]
 	for i in range(int(durationH/Xspacing)):
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
 		FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
 	p = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(h0_array))]
-	ppsis = [0 for _ in rannge(len(psi_array))]
+	ppsis = [0 for _ in range(len(psi_array))]
 	logdpsi_2 = np.log(0.5*dpsi)
 
-	pbar = ProgressBar(widgets=widgets, maxval=int(durationH/Xspacing)-1)
+	pbar = ProgressBar(widgets=widgets, max_value=int(durationH/Xspacing)-1)
 	pbar.start()
 	for i in range(int(durationH/Xspacing)):
 		for j in range(len(h0_array)):
@@ -121,13 +117,17 @@ def likelihood(starttime=969062862, endtime=969063629, h0_factor=3, h0_vals_num=
 				int1 = i + int(30/Xspacing)
 				sigmaX = np.std(strainH[int0:int1])
 				sigmaY = np.std(strainL[int0:int1])
-				d = np.array([dX, dY])
+				d = np.array([dX[i], dY[i]])
 				d.shape = (2,1)
+				print h0_array[j]
+				print FpX
 				M = h0_array[j]*np.array([[FpX, FpY], [FcX, FcY]])
+				print M
 				C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 				invC = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 				detC = sigmaX**2 * sigmaY**2
 				invSigma = np.dot(M.T, np.dot(invC, M)) + invSigma0
+				print invSigma
 				Sigma = np.linalg.inv(invSigma)
 				detSigma = np.linalg.det(Sigma)
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
