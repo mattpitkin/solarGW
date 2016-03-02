@@ -144,7 +144,7 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	pbar.finish()
 	print
 
-	# Write into a file
+	# Write into a file.
 	f = h5py.File('/home/spxha/probability.hdf5','w')
 	f.create_dataset(h0_array,'h0')
 	f.create_dataset(p,'p')
