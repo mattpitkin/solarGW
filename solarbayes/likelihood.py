@@ -96,7 +96,7 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	for i in range(int(durationH/Xspacing)):
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
 		FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
-	p = [[0 for _ in range(int(durationH/Xspacing))] for _ in range(len(h0_array))]
+	p = [0  for _ in range(len(h0_array))]
 	ppsi = [0 for _ in range(len(psi_array))]
 	logdpsi_2 = np.log(0.5*dpsi)
 
@@ -135,22 +135,21 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 				detSigma = np.linalg.det(Sigma)
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
 				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*np.log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
-			p[j][i] = logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
+			p[j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
 		pbar.update(i)
 	pbar.finish()
 	print
 
-	# Write into an hdf5 file just in case
+	# Write into a file
 	f = h5py.File('/home/spxha/probability.hdf5','w')
 	h0_dset = f.create_dataset(h0_array,'h0')
-	for i in range(len(h0_array)):
-		f.create_dataset(p[i],'p'+str(i))
+	f.create_dataset(p,'p')
 	#------ plot the probability distribution
 	print 'Producing Plot'
 	fname = 'probdist.pdf'
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
-		plt.plot(p[1],p[0],',')
+		plt.plot(h0_array,p,',')
 		plt.title('Probability Distribution')
 		pdf.savefig(fig1)
 		plt.close()
