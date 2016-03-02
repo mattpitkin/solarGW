@@ -29,9 +29,10 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
 	strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
 	num_points = int(durationH/Xspacing)
-	#---------------------------
+
+	#----------------------------
 	# Applying a bandpass filter
-	#---------------------------
+	#----------------------------
 	print 'Filtering data'
 	ord = 4
 	Wn = [100.0/2918.0,150.0/2918.0]
