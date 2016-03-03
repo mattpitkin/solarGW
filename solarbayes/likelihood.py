@@ -1,4 +1,4 @@
-def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=25):
+def likelihood(starttime=969062862, endtime=969062925, h0_factor=3, h0_vals_num=25):
 	#------- Packages ---------#
 	import numpy as np
 	import astropy, gwpy, h5py, lal
@@ -10,6 +10,8 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	from antres import antenna_response as ant_res
 	from scipy.misc import logsumexp
 	from progressbar import AnimatedMarker, Bar, BouncingBar, Counter, ETA, FileTransferSpeed, FormatLabel, Percentage, ProgressBar, ReverseBar, RotatingMarker, SimpleProgress, Timer, AdaptiveETA, AbsoluteETA, AdaptiveTransferSpeed
+	from notchfilt import get_filter_coefs
+	from notchfilt import filter_data
 
 	widgets = ['Finding Likelihood ', Percentage(), ' ', Bar(marker='#',left='[',right=']'),
            ' ', AbsoluteETA(), ' ', AdaptiveTransferSpeed()]
@@ -34,13 +36,15 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	# Applying a bandpass filter
 	#----------------------------
 	print 'Filtering data'
-	ord = 4
-	Wn = [100.0/2918.0,150.0/2918.0]
-	type = 'bandpass'
-	bL,aL = butter(ord,Wn, btype=type)
-	bH,aH = butter(ord,Wn, btype=type)
-	strainL = filtfilt(bL,aL,strainL)
-	strainH = filtfilt(bH,aH,strainH)
+# 	ord = 4
+# 	Wn = [100.0/2918.0,150.0/2918.0]
+# 	type = 'bandpass'
+# 	bL,aL = butter(ord,Wn, btype=type)
+# 	bH,aH = butter(ord,Wn, btype=type)
+	coefsL = get_filter_coefs('L1')
+	coefsH = get_filter_coefs('H1')
+	strainL = filter_data(strainL,coefsL)
+	strainH = filter_data(strainH,coefsH)
 
 	print 'Getting the detectors in sync'
 	timeH = np.arange(gpsStartH, gpsEndH, Xspacing)
@@ -103,6 +107,8 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 
 	cos2pi, sin2pi = [[0 for _ in range(len(psi_array))] for _ in range(2)]
 	FpX, FcX, FpY, FcY = [[[0 for _ in range(num_points)] for _ in range(len(psi_array))] for _ in range(4)]
+	pbar = ProgressBar(widgets=widgets, max_value=len(psi_array)-1)
+        pbar.start()
 	for k in range(len(psi_array)):
 		cos2pi[k] = np.cos(2*psi_array[k])
 		sin2pi[k] = np.sin(2*psi_array[k])
@@ -111,7 +117,9 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
-
+                pbar.update(k)
+        pbar.finish()
+        print
 	print 'Finding likelihoot Part 2/2. This will take a while... '
 	pbar = ProgressBar(widgets=widgets, max_value=num_points-1)
 	pbar.start()
@@ -146,9 +154,8 @@ def likelihood(starttime=969062862, endtime=969063609, h0_factor=3, h0_vals_num=
 	print
 
 	# Write into a file.
-	f = h5py.File('/home/spxha/probability.hdf5','w')
-	f.create_dataset(h0_array,'h0')
-	f.create_dataset(p,'p')
+	np.savetxt('h0',h0_array)
+	np.savetxt('p.txt',p)
 
 	#------ plot the probability distribution
 	print 'Producing Plot'
