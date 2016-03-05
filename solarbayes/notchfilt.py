@@ -55,7 +55,7 @@ def get_filter_coefs(det,fs=4096):
     if det=='L1':
     	notchesAbsolute = np.array([120.0, 139.94, 145.06, 108.992])
     elif det=='H1':
-		notchesAbsolute = np.array([120.0, 139.95, 140.41, 108.992])
+	notchesAbsolute = np.array([120.0, 139.95, 140.41, 108.992])
     else:
     	print 'Error: Detector can only be H1 or L1'
 		exit()

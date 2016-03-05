@@ -13,32 +13,17 @@ from progressbar import AnimatedMarker, Bar, BouncingBar, Counter, ETA, FileTran
 from notchfilt import get_filter_coefs, filter_data, iir_bandstops
 
 print 'Reading data'
-starttime = 969062862
-endtime = 969065629
-
-print 'Reading data'
 starttime = 969062862.0
 endtime = 969063629.0
 gpsStartH = starttime
 durationH = endtime - starttime
-gpsEndH   = endtime
-gpsStartL = gpsStartH
-durationL = durationH
-gpsEndL   = gpsEndH
-Xspacing = 2.44140625E-4
-gpsTime = np.linspace(starttime,endtime,int(1/Xspacing))
-pathtoinput = "/home/spxha/"
-strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
-strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
-num_points = int(durationH/Xspacing)
-timeH = np.arange(gpsStartH, gpsEndH, Xspacing)
-timeL = np.arange(gpsStartL, gpsEndL, Xspacing)
 
-gpsTime = np.linspace(starttime,endtime,int(durationH/Xspacing))
+Xspacing = 2.44140625E-4
+
+gpsTime = np.linspace(starttime,endtime,int(durationH/Xspacing)*4)
 pathtoinput = "/home/spxha/"
 strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
 strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
-num_points = int(durationH/Xspacing)
 timeH = np.arange(starttime, endtime, Xspacing)
 timeL = np.arange(starttime, endtime, Xspacing)
 
@@ -57,38 +42,9 @@ coefsL = get_filter_coefs('L1')
 coefsH = get_filter_coefs('H1')
 strainL2 = filter_data(strainL,coefsL)
 strainH2 = filter_data(strainH,coefsH)
+
 print 'Standard deviations after adding the notch-filters', np.std(strainL2), np.std(strainH2)
-<<<<<<< HEAD
 
-print 'Plotting'
-plt.figure(1)
-plt.plot(timeH,strainH1,'-')
-plt.title('Bandpass filtered data of H1 detector for '+str(durationH/60)+' minutes')
-plt.xlabel('TimeSeries')
-plt.ylabel('Strain')
-plt.show(1)
-
-plt.figure(2)
-plt.plot(timeH,strainH2,'-')
-plt.xlabel('TimeSeries')
-plt.ylabel('Strain')
-plt.title('Bandpass + notch filtered data of H1 detector for '+str(durationH/60)+' minutes')
-plt.show(2)
-
-plt.figure(3)
-plt.plot(timeH,strainL1,'-')
-plt.title('Bandpass filtered data of L1 detector for '+str(durationH/60)+' minutes')
-plt.xlabel('TimeSeries')
-plt.ylabel('Strain')
-plt.show(3)
-
-plt.figure(4)
-plt.plot(timeH,strainL2,'-')
-plt.xlabel('TimeSeries')
-plt.ylabel('Strain')
-plt.title('Bandpass + notch filtered data of L1 detector for '+str(durationH/60)+' minutes')
-=======
-print len(timeL),len(strainL),len(gpsTime)
 print 'Plotting'
 plt.figure(1)
 plt.plot(gpsTime,strainH1,'-')
