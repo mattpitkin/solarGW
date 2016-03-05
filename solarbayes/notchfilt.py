@@ -1,10 +1,5 @@
+
 def iir_bandstops(fstops, fs, order=4):
-    """ellip notch filter
-    fstops is a list of entries of the form [frequency (Hz), df, df2]                           
-    where df is the pass width and df2 is the stop width (narrower                              
-    than the pass width). Use caution if passing more than one freq at a time,                  
-    because the filter response might behave in ways you don't expect.
-    """
     import numpy as np
     from scipy.signal import iirdesign, zpk2tf, freqz
     nyq = 0.5 * fs
@@ -27,18 +22,19 @@ def iir_bandstops(fstops, fs, order=4):
         zd = np.append(zd,z)
         pd = np.append(pd,p)
 
-    # Set gain to one at 100 Hz...better not notch there                                        
+    # Set gain to one at 100 Hz...better not notch there
     bPrelim,aPrelim = zpk2tf(zd, pd, 1)
     outFreq, outg0 = freqz(bPrelim, aPrelim, 100/nyq)
 
-    # Return the numerator and denominator of the digital filter                                
+    # Return the numerator and denominator of the digital filter
     b,a = zpk2tf(zd,pd,k)
     return b, a
 
 def get_filter_coefs(det,fs=4096):
     from scipy.signal import butter, filtfilt, iirdesign, zpk2tf, freqz
     import numpy as np
-    from notchfilt import iir_bandstops    
+    from notchfilt import iir_bandstops
+
     # assemble the filter b,a coefficients:
     coefs = []
 
@@ -61,8 +57,8 @@ def get_filter_coefs(det,fs=4096):
     elif det=='H1':
 		notchesAbsolute = np.array([120.0, 139.95, 140.41, 108.992])
     else:
-    	print 'Detector can only be H1 or L1'
-
+    	print 'Error: Detector can only be H1 or L1'
+		exit()
     # notch filter coefficients:
     for notchf in notchesAbsolute:
         bn, an = iir_bandstops(np.array([[notchf,1,0.1]]), fs, order=4)
