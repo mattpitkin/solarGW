@@ -1,4 +1,4 @@
-def likelihood(starttime=969062862, endtime=969062925, h0_factor=3, h0_vals_num=25):
+def likelihood(starttime=969062862, endtime=969062925, h0_min=0.00001, h0_max=0.1 h0_vals_num=25):
 	#------- Packages ---------#
 	import numpy as np
 	import astropy, gwpy, h5py, lal
@@ -92,7 +92,7 @@ def likelihood(starttime=969062862, endtime=969062925, h0_factor=3, h0_vals_num=
 	psi_array = np.linspace(0,np.pi,10)
 	dpsi = psi_array[1]-psi_array[0]
 	sigmaA = 10.0
-	h0_array = np.linspace(0.001*np.std(strainH),h0_factor*np.std(strainH),h0_vals_num)
+	h0_array = np.linspace(h0_min*np.std(strainH),h0_max*np.std(strainH),h0_vals_num)
 	invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 	detSigma0 = sigmaA**4
 	dX = strainH
