@@ -58,7 +58,7 @@ def get_filter_coefs(det,fs=4096):
 	notchesAbsolute = np.array([120.0, 139.95, 140.41, 108.992])
     else:
     	print 'Error: Detector can only be H1 or L1'
-		exit()
+	exit()
     # notch filter coefficients:
     for notchf in notchesAbsolute:
         bn, an = iir_bandstops(np.array([[notchf,1,0.1]]), fs, order=4)

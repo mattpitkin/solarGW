@@ -1,11 +1,13 @@
-def likelihood(starttime=969062862, endtime=969062925, h0_min=0.00001, h0_max=0.1 h0_vals_num=25):
+def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0.001, h0_vals_num=25):
 	#------- Packages ---------#
 	import numpy as np
 	import astropy, gwpy, h5py, lal
 	from astropy.coordinates import get_sun
 	import astropy.time as Time
+	from matplotlib.backends.backend_pdf import PdfPages
 	from scipy.signal import butter
 	from scipy.signal import filtfilt
+	import matplotlib.pyplot as plt
 	from gwpy.timeseries import TimeSeries
 	from antres import antenna_response as ant_res
 	from scipy.misc import logsumexp
