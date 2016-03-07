@@ -5,15 +5,13 @@ def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0
 	from astropy.coordinates import get_sun
 	import astropy.time as Time
 	from matplotlib.backends.backend_pdf import PdfPages
-	from scipy.signal import butter
-	from scipy.signal import filtfilt
+	from scipy.signal import butter, filtfilt
 	import matplotlib.pyplot as plt
 	from gwpy.timeseries import TimeSeries
 	from antres import antenna_response as ant_res
 	from scipy.misc import logsumexp
 	from progressbar import AnimatedMarker, Bar, BouncingBar, Counter, ETA, FileTransferSpeed, FormatLabel, Percentage, ProgressBar, ReverseBar, RotatingMarker, SimpleProgress, Timer, AdaptiveETA, AbsoluteETA, AdaptiveTransferSpeed
-	from notchfilt import get_filter_coefs
-	from notchfilt import filter_data
+	from notchfilt import get_filter_coefs, filter_data
 
 	widgets = ['Finding Likelihood ', Percentage(), ' ', Bar(marker='#',left='[',right=']'),
            ' ', AbsoluteETA(), ' ', AdaptiveTransferSpeed()]
