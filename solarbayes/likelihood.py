@@ -36,11 +36,6 @@ def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0
 	# Applying a bandpass filter
 	#----------------------------
 	print 'Filtering data'
-# 	ord = 4
-# 	Wn = [100.0/2918.0,150.0/2918.0]
-# 	type = 'bandpass'
-# 	bL,aL = butter(ord,Wn, btype=type)
-# 	bH,aH = butter(ord,Wn, btype=type)
 	coefsL = get_filter_coefs('L1')
 	coefsH = get_filter_coefs('H1')
 	strainL = filter_data(strainL,coefsL)
@@ -154,12 +149,13 @@ def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0
 	print
 
 	# Write into a file.
-	np.savetxt('h0',h0_array)
+	np.savetxt('h0.txt',h0_array)
 	np.savetxt('p.txt',p)
 
 	#------ plot the probability distribution
 	print 'Producing Plot'
 	fname = 'probdist.pdf'
+	p = np.exp(p-np.max(p))
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
 		plt.plot(h0_array,p,'+')
