@@ -71,16 +71,16 @@ def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
 	#----------- Down-sampling ------------#
-	newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(int(durationH/32))] for _ in range(4)]
+	print 'Down-sampling'
+        Xspacing = Xspacing*32
+        num_points = int(durationH/Xspacing)
+	newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
 	for i in range(int(durationH/32)):
 		j = 32*i + 16
 		newstrainH[i] = np.mean(strainH[j-16:j+16])
 		newstrainL[i] = np.mean(strainL[j-16:j+16])
 		newtimeH[i] = timeH[j]
 		newtimeL[i] = timeL[j]
-		Xspacing = Xspacing*32
-		num_points = int(durationH/Xspacing)
-	print newstrainH
 	############################################################
 	#------------ Finding probability distribution ------------#
 	#------- Defining some stuff for p ------#
