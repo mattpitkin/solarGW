@@ -75,12 +75,13 @@ def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0
         Xspacing = Xspacing*32
         num_points = int(durationH/Xspacing)
 	newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
-	for i in range(int(durationH/32)):
+	for i in range(num_points):
 		j = 32*i + 16
 		newstrainH[i] = np.mean(strainH[j-16:j+16])
 		newstrainL[i] = np.mean(strainL[j-16:j+16])
 		newtimeH[i] = timeH[j]
 		newtimeL[i] = timeL[j]
+	print num_points
 	############################################################
 	#------------ Finding probability distribution ------------#
 	#------- Defining some stuff for p ------#
