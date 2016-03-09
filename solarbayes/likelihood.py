@@ -1,4 +1,4 @@
-def likelihood(starttime=969062862, endtime=969062935, h0_min=0.000001, h0_max=0.001, h0_vals_num=25):
+def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0.001, h0_vals_num=25):
 	#------- Packages ---------#
 	import numpy as np
 	import astropy, gwpy, h5py, lal
@@ -78,6 +78,8 @@ def likelihood(starttime=969062862, endtime=969062935, h0_min=0.000001, h0_max=0
 		newstrainL[i] = np.mean(strainL[j-16:j+16])
 		newtimeH[i] = timeH[j]
 		newtimeL[i] = timeL[j]
+	Xspacing = Xspacing*32
+        num_points = int(durationH/Xspacing)
 
 	############################################################
 	#------------ Finding probability distribution ------------#
