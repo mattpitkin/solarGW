@@ -1,4 +1,4 @@
-def likelihood(starttime=969062862, endtime=969062935, h0_min=0.000001, h0_max=0.001, h0_vals_num=25):
+def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0.001, h0_vals_num=25):
 	#------- Packages ---------#
 	import numpy as np
 	import astropy, gwpy, h5py, lal
@@ -44,7 +44,6 @@ def likelihood(starttime=969062862, endtime=969062935, h0_min=0.000001, h0_max=0
 	print 'Getting the detectors in sync'
 	timeH = np.arange(gpsStartH, gpsEndH, Xspacing)
 	timeL = np.arange(gpsStartL, gpsEndL, Xspacing)
-	timel=timeL
 	detMap = {'H1': lal.LALDetectorIndexLHODIFF, 'L1':
 	lal.LALDetectorIndexLLODIFF}
 	detH1 = lal.CachedDetectors[detMap['H1']]
@@ -56,7 +55,7 @@ def likelihood(starttime=969062862, endtime=969062935, h0_min=0.000001, h0_max=0
 	seg30 = gpsStartH + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
 	tdelay = [[0] for _ in range(numseg30)]
 	for i in range(numseg30-1):
-		if ((timel[int(i/Xspacing)]>seg30[i])&(timel[int(i/Xspacing)]<seg30[i+1])):
+		if ((timeL[int(i/Xspacing)]>seg30[i])&(timeL[int(i/Xspacing)]<seg30[i+1])):
 			coordstime=seg30[i]
 			coords = get_sun(Time.Time(coordstime,format='gps'))
 			tdelay[i] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
@@ -71,6 +70,16 @@ def likelihood(starttime=969062862, endtime=969062935, h0_min=0.000001, h0_max=0
 	timeL = timeL - tdelay
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
+	#----------- Down-sampling ------------#
+	newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(int(durationH/32))] for _ in range(4)]
+	for i in range(int(durationH/32)):
+		j = 32*i + 16
+		newstrainH[i] = np.mean(strainH[j-16:j+16])
+		newstrainL[i] = np.mean(strainL[j-16:j+16])
+		newtimeH[i] = timeH[j]
+		newtimeL[i] = timeL[j]
+	Xspacing = Xspacing*32
+        num_points = int(durationH/Xspacing)
 	############################################################
 	#------------ Finding probability distribution ------------#
 	#------- Defining some stuff for p ------#
@@ -87,11 +96,11 @@ def likelihood(starttime=969062862, endtime=969062935, h0_min=0.000001, h0_max=0
 	psi_array = np.linspace(0,np.pi,10)
 	dpsi = psi_array[1]-psi_array[0]
 	sigmaA = 10.0
-	h0_array = np.linspace(h0_min*np.std(strainH),h0_max*np.std(strainH),h0_vals_num)
+	h0_array = np.linspace(h0_min*np.std(newstrainH),h0_max*np.std(newstrainH),h0_vals_num)
 	invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 	detSigma0 = sigmaA**4
-	dX = strainH
-	dY = strainL
+	dX = newstrainH
+	dY = newstrainL
 	FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(num_points)] for _ in range(4)]
 	for i in range(num_points):
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
@@ -129,8 +138,8 @@ def likelihood(starttime=969062862, endtime=969062935, h0_min=0.000001, h0_max=0
 			int0 = i - int(60/Xspacing)
 		else:
 			int0 = 0
-		sigmaX = np.std(strainH[int0:int1])
-		sigmaY = np.std(strainL[int0:int1])
+		sigmaX = np.std(newstrainH[int0:int1])
+		sigmaY = np.std(newstrainL[int0:int1])
 		C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 		invC = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 		detC = sigmaX**2 * sigmaY**2
