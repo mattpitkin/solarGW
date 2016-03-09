@@ -1,4 +1,4 @@
-def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0.001, h0_vals_num=25):
+def likelihood(starttime=969062862, endtime=969063995, h0_min=0.000001, h0_max=0.001, h0_vals_num=25):
 	#------- Packages ---------#
 	import numpy as np
 	import astropy, gwpy, h5py, lal
@@ -82,6 +82,8 @@ def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0
 		newtimeH[i] = timeH[j]
 		newtimeL[i] = timeL[j]
 	print num_points
+
+
 	############################################################
 	#------------ Finding probability distribution ------------#
 	#------- Defining some stuff for p ------#
@@ -165,7 +167,9 @@ def likelihood(starttime=969062862, endtime=969062995, h0_min=0.000001, h0_max=0
 
 	#------ plot the probability distribution
 	print 'Producing Plot'
-	fname = 'probdist.pdf'
+	startname = int(starttime) % 100000
+	endname = int(endtime) % 100000
+	fname = 'probdist'+str(starttime)+'_'+str(endtime)+'.pdf'
 	p = np.exp(p-np.max(p))
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
