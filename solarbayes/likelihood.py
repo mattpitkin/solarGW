@@ -100,7 +100,9 @@ def likelihood(starttime=969062862, endtime=969063995, h0_min=0.0000001, h0_max=
 	psi_array = np.linspace(0,np.pi,10)
 	dpsi = psi_array[1]-psi_array[0]
 	sigmaA = 10.0
-	h0_array = np.linspace(h0_min*np.std(newstrainH),h0_max*np.std(newstrainH),h0_vals_num)
+	h0min = h0_min*np.std(newstrainH)
+	h0max = h0_max*np.std(newstrainH)
+	h0_array = np.linspace(h0min,h0max,h0_vals_num)
 	invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 	detSigma0 = sigmaA**4
 	dX = newstrainH
@@ -167,14 +169,16 @@ def likelihood(starttime=969062862, endtime=969063995, h0_min=0.0000001, h0_max=
 
 	#------ plot the probability distribution
 	print 'Producing Plot'
-	startname = int(starttime) % 100000
-	endname = int(endtime) % 100000
-	fname = 'probdist'+str(starttime)+'_'+str(endtime)+'.pdf'
+	startname = str(int(starttime) % 100000)
+	endname = str(int(endtime) % 100000)
+	fname = 'probdist'+starttime+'_'+endtime+'.pdf'
 	p = np.exp(p-np.max(p))
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
 		plt.plot(h0_array,p,'+')
-		plt.title('Probability Distribution')
+		plt.title('Probability Distribution for GPS'+startname+'_'+endtime)
+		plt.xlabel('h0'+str(h0_min)+'_'+str(h0_max))
+		plt.ylabel('p')
 		pdf.savefig(fig1)
 		plt.close()
 	print 'Plot saved as', fname, 'Did we find GWs?!'
