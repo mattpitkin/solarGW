@@ -27,6 +27,7 @@ strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN',
 timeH = np.arange(starttime, endtime, Xspacing)
 timeL = np.arange(starttime, endtime, Xspacing)
 
+strainL0 = strainL
 print 'Filtering data'
 ord = 4
 Wn = [100.0/2918.0,150.0/2918.0]
@@ -47,33 +48,33 @@ print 'Standard deviations after adding the notch-filters', np.std(strainL2), np
 
 print 'Plotting'
 plt.figure(1)
-plt.plot(gpsTime,strainH1,'-')
-plt.title('Bandpass filtered data of H1 detector for '+str(durationH/60)+' minutes')
+plt.plot(gpsTime,strainL0,'-')
+plt.title('Raw data of L1 detector for '+str(durationH/60)+' minutes')
 plt.xlabel('TimeSeries')
 plt.ylabel('Strain')
-plt.savefig('1.png')
+plt.savefig('rawdata.png')
 plt.show(1)
-
-plt.figure(2)
-plt.plot(gpsTime,strainH2,'-')
-plt.xlabel('TimeSeries')
-plt.ylabel('Strain')
-plt.title('Bandpass + notch filtered data of H1 detector for '+str(durationH/60)+' minutes')
-plt.savefig('2.png')
-plt.show(2)
-
-plt.figure(3)
-plt.plot(gpsTime,strainL1,'-')
-plt.title('Bandpass filtered data of L1 detector for '+str(durationH/60)+' minutes')
-plt.xlabel('TimeSeries')
-plt.ylabel('Strain')
-plt.savefig('3.png')
-plt.show(3)
-
-plt.figure(4)
-plt.plot(gpsTime,strainL2,'-')
-plt.xlabel('TimeSeries')
-plt.ylabel('Strain')
-plt.title('Bandpass + notch filtered data of L1 detector for '+str(durationH/60)+' minutes')
-plt.savefig('4.png')
-plt.show(4)
+#
+# plt.figure(2)
+# plt.plot(gpsTime,strainH2,'-')
+# plt.xlabel('TimeSeries')
+# plt.ylabel('Strain')
+# plt.title('Bandpass + notch filtered data of H1 detector for '+str(durationH/60)+' minutes')
+# plt.savefig('2.png')
+# plt.show(2)
+#
+# plt.figure(3)
+# plt.plot(gpsTime,strainL1,'-')
+# plt.title('Bandpass filtered data of L1 detector for '+str(durationH/60)+' minutes')
+# plt.xlabel('TimeSeries')
+# plt.ylabel('Strain')
+# plt.savefig('3.png')
+# plt.show(3)
+#
+# plt.figure(4)
+# plt.plot(gpsTime,strainL2,'-')
+# plt.xlabel('TimeSeries')
+# plt.ylabel('Strain')
+# plt.title('Bandpass + notch filtered data of L1 detector for '+str(durationH/60)+' minutes')
+# plt.savefig('4.png')
+# plt.show(4)
