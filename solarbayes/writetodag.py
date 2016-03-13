@@ -1,7 +1,7 @@
 def writetodag(starttime, endtime, h0max='adaptive'):
 	import numpy as np
 	import os
-	timearray = np.array(np.loadtxt('intersect6.txt',dtype='f8'))
+	timearray = np.array(np.loadtxt('../intersect.txt',dtype='f8'))
 	StartTimes = timearray[:,0]
 	EndTimes   = timearray[:,1]
 	if h0max=='adaptive':
