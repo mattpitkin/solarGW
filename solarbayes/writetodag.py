@@ -32,11 +32,11 @@ def writetodag(starttime, endtime, h0max='adaptive'):
 
 	# Find nearest value to targeted starttime and endtime
 	newStartTimes = StartTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
-	newEndTimes   = StartTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
+	newEndTimes   =   EndTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
 
 	# Now everything is ready, write to a dag file
 	file = open("bayesjob.dag", "w")
 	for i in range(len(newStartTimes)):
 		file.write('JOB '+str(i+1)+' bayesjob.sub\n')
-		file.write('VARS '+str(i+1)+' starttime="'+str(int(newStartTimes[i]))+'" endtime="'+str(int(newEndTimes[i]))+'" h0_max0="'+str(h0_max)+'"'+'\n')
+		file.write('VARS '+str(i+1)+' starttime="'+str(int(newStartTimes[i]))+'" endtime="'+str(int(newEndTimes[i]))+'" h0="'+str(h0_max)+'"'+'\n')
 	file.close()

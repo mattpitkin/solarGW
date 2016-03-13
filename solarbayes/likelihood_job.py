@@ -19,12 +19,12 @@ import sys
 parser = OptionParser()
 parser.add_option("--start",   dest="starttime", type="int", help="GPS Start time")
 parser.add_option("--end",     dest="endtime",   type="int", help="GPS End Time")
-parser.add_option("--h0_max0", dest="h0_max",   type="float", help="GPS End Time")
+parser.add_option("--h0_max", dest="h0",   type="float", help="GPS End Time")
 (opts, args) = parser.parse_args()
 
 starttime = opts.starttime
 endtime = opts.endtime
-h0_max = opts.h0_max
+h0_max = opts.h0
 
 #-------- Importing, filtering and timeshifting data ----------#
 gpsStartH = starttime
@@ -78,8 +78,8 @@ timeL = timeL - tdelay
 # H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
 #----------- Down-sampling ------------#
-	Xspacing = Xspacing*32
-	num_points = int(durationH/Xspacing)
+Xspacing = Xspacing*32
+num_points = int(durationH/Xspacing)
 newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
 for i in range(num_points):
 	j = 32*i + 16
