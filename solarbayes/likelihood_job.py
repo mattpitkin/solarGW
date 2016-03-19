@@ -25,7 +25,12 @@ parser.add_option("--h0_max", dest="h0",   type="float", help="GPS End Time")
 starttime = opts.starttime
 endtime = opts.endtime
 h0_max = opts.h0
-
+if h0_max == 0.0001:
+	wm = 'w'
+elif h0_max == 0.00001:
+	wm = 'm'
+else:
+	wm = str(h0_max)
 #-------- Importing, filtering and timeshifting data ----------#
 gpsStartH = starttime
 durationH = endtime - starttime
@@ -158,4 +163,5 @@ for i in range(num_points):
 		p[j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
 
 # Write into a file.
-np.savetxt('p'+str(starttime)+'.txt',p)
+np.savetxt('p' +str(starttime)+wm+'.txt',p)
+np.savetxt('h0'+str(starttime)+wm+'.txt',h0_array)
