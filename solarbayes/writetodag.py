@@ -11,6 +11,8 @@ def writetodag(starttime, endtime, h0max='adaptive'):
 			h0_max = 0.0001
 		elif 'month' in endtime:
 			h0_max = 0.00001
+		elif 'all' in endtime:
+			h0_max = 0.000006
 		else:
 			h0_max = h0max
 	elif h0max=='def':
@@ -32,7 +34,9 @@ def writetodag(starttime, endtime, h0max='adaptive'):
 			endtime   = 931076896 + 604800 * i
 		else:
 			pass
-
+		if starttime == 'all':
+			starttime = 931076896
+			endtime = 971614889
 
 	# Find nearest value to targeted starttime and endtime
 	newStartTimes = StartTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
