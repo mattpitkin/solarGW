@@ -13,7 +13,7 @@ from antres import antenna_response as ant_res
 from scipy.misc import logsumexp
 from notchfilt import get_filter_coefs, filter_data
 from optparse import OptionParser
-import sys
+import sys, os
 
 # Read Macros
 parser = OptionParser()
@@ -165,6 +165,10 @@ for i in range(num_points):
 		p[j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
 
 # Write into a file.
-mkdir wm
+if os.path.exists(wm)==False:
+	os.mkdir(wm)
+else:
+	pass
+
 np.savetxt(wm+'/p'+str(starttime)+'.txt',p)
 np.savetxt(wm+'/h0'+str(starttime)+'.txt',h0_array)
