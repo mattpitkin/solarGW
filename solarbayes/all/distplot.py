@@ -6,43 +6,25 @@ def plotdist(starttime,endtime):
 	from matplotlib.backends.backend_pdf import PdfPages
 	import matplotlib.pyplot as plt
 	import os
-        fname =	'probdist_'+starttime+'_'+endtime+'.pdf'
+	fname =	'probdist_'+starttime+'_'+endtime+'.pdf'
 	fname1 = str(starttime)
 	fname2 = str(endtime)
-	timearray = np.array(np.loadtxt('../../intersect.txt',dtype='f8'))
+	timearray = np.array(np.loadtxt('/home/spxha/solarGW/intersect.txt',dtype='f8'))
 	StartTimes = timearray[:,0]
 	EndTimes   = timearray[:,1]
-	for i in range(70):
-		if starttime == 'month'+str(i):
-			starttime = 931076896 + 2592000 * i
-			wm = 'm'
-		else:
-			pass
-		if endtime   == 'month'+str(i):
-			endtime = 931076896 + 2592000 *i
-			wm = 'm'
-		else:
-			pass
-		if starttime == 'week'+str(i):
-			starttime = 931076896 + 604800 * i
-			wm = 'w'
-		else:
-			pass
-		if endtime   == 'week'+str(i):
-			endtime   = 931076896 + 604800 * i
-			wm = 'w'
-		else:
-			pass
-	newStartTimes = StartTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
-	newEndTimes   =   EndTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
+	if starttime=='all' and endtime=='all:
+		starttime = 931076896.0
+		endtime   = 971614889.0
+	duration = 0
+	newStartTimes = StartTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes-endtime)).argmin()]
+	newEndTimes   =   EndTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes-endtime)).argmin()]
 	p_array,h0_array = [[[0 for _ in range(30)] for _ in range(len(newStartTimes))] for _ in range(2)]
 	for i in range(len(newStartTimes)):
 		pathi = 'p'+str(int(newStartTimes[i]))+wm+'.txt'
-		print pathi
 		if os.path.exists(pathi)==True:
 			p_array[i]  = np.array(np.loadtxt('p'+str(int(newStartTimes[i]))+wm+'.txt',dtype='float'))
 			h0_array[i] = np.array(np.loadtxt('h0'+str(int(newStartTimes[i]))+wm+'.txt',dtype='float'))
-			print p_array[i], h0_array[i]
+			duration += newEndTimes[i]-newStartTimes[i]
 		else:
 			pass
 	p_sum_array = [0.0 for _ in range(30)]
@@ -59,7 +41,7 @@ def plotdist(starttime,endtime):
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
 		plt.plot(h0_mean_array,p,'+')
-		plt.title('Probability Distribution for GPS'+str(starttime)+'_'+str(endtime))
+		plt.title('Probability Distribution for '+str(duration/(3600))+' hours')
 		plt.xlabel('h0')
 		plt.ylabel('p')
 		pdf.savefig(fig1)
