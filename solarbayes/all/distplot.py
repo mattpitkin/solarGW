@@ -20,10 +20,10 @@ def plotdist(starttime,endtime):
 	newEndTimes   =   EndTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes-endtime)).argmin()]
 	p_array,h0_array = [[[0 for _ in range(30)] for _ in range(len(newStartTimes))] for _ in range(2)]
 	for i in range(len(newStartTimes)):
-		pathi = 'p'+str(int(newStartTimes[i]))+wm+'.txt'
+		pathi = 'p'+str(int(newStartTimes[i]))+'.txt'
 		if os.path.exists(pathi)==True:
-			p_array[i]  = np.array(np.loadtxt('p'+str(int(newStartTimes[i]))+wm+'.txt',dtype='float'))
-			h0_array[i] = np.array(np.loadtxt('h0'+str(int(newStartTimes[i]))+wm+'.txt',dtype='float'))
+			p_array[i]  = np.array(np.loadtxt('p'+str(int(newStartTimes[i]))+'.txt',dtype='float'))
+			h0_array[i] = np.array(np.loadtxt('h0'+str(int(newStartTimes[i]))+'.txt',dtype='float'))
 			duration += newEndTimes[i]-newStartTimes[i]
 		else:
 			pass
