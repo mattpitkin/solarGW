@@ -8,9 +8,9 @@ def writetodag(starttime, endtime, h0max='adaptive'):
 	EndTimes   = timearray[:,1]
 	if h0max=='adaptive':
 		if 'week' in endtime:
-			h0_max = 0.0001
+			h0_max = 0.0004
 		elif 'month' in endtime:
-			h0_max = 0.00001
+			h0_max = 0.0001
 		elif 'all' in endtime:
 			h0_max = 0.000006
 		else:

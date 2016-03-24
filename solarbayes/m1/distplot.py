@@ -33,30 +33,34 @@ def plotdist(starttime,endtime):
 			wm = 'w'
 		else:
 			pass
-	print StartTimes, starttime, EndTimes, endtime
 	newStartTimes = StartTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
 	newEndTimes   =   EndTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
 	p_array,h0_array = [[[0 for _ in range(30)] for _ in range(len(newStartTimes))] for _ in range(2)]
 	for i in range(len(newStartTimes)):
-		if os.path.exists('p'+str(int(newStartTimes[i]))+wm)==True:
-			p_array[i]  = np.array(np.loadtxt('p'+str(int(newStartTimes[i]))+wm,dtype='float'))
-			h0_array[i] = np.array(np.loadtxt('h0'+str(int(newStartTimes[i]))+wm,dtype='float'))
+		pathi = 'p'+str(int(newStartTimes[i]))+wm+'.txt'
+		print pathi
+		if os.path.exists(pathi)==True:
+			p_array[i]  = np.array(np.loadtxt('p'+str(int(newStartTimes[i]))+wm+'.txt',dtype='float'))
+			h0_array[i] = np.array(np.loadtxt('h0'+str(int(newStartTimes[i]))+wm+'.txt',dtype='float'))
+			print p_array[i], h0_array[i]
 		else:
 			pass
-	p_sum_array = [0 for _ in range(30)]
+	p_sum_array = [0.0 for _ in range(30)]
 	p_sum_array = np.array(p_sum_array)
 	h0_array = np.array(h0_array)
+	print p_array[1]
+	p_array = np.array(p_array)
 	for i in range(len(p_array)-1):
 		p_sum_array += p_array[i+1]
 	h0_mean_array = h0_array.mean(0)
-
+	p = np.exp(p_sum_array-np.max(p_sum_array))
+	print h0_mean_array,p
 	# plot the distribution
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
-		plt.plot(h0_mean_array,p_sum_array,'+')
+		plt.plot(h0_mean_array,p,'+')
 		plt.title('Probability Distribution for GPS'+str(starttime)+'_'+str(endtime))
 		plt.xlabel('h0')
 		plt.ylabel('p')
 		pdf.savefig(fig1)
 		plt.close()
-#	print 'Plot saved as', fname, 'Did we find GWs?!'
