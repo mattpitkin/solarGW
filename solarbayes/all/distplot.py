@@ -24,7 +24,7 @@ def plotdist(starttime,endtime):
 		if os.path.exists(pathi)==True:
 			p_array[i]  = np.array(np.loadtxt('p'+str(int(newStartTimes[i]))+'.txt',dtype='float'))
 			h0_array[i] = np.array(np.loadtxt('h0'+str(int(newStartTimes[i]))+'.txt',dtype='float'))
-			duration += newEndTimes[i]-newStartTimes[i]
+			duration += newEndTimes[i]-newStartTimes[i] - 150
 		else:
 			pass
 	p_sum_array = [0.0 for _ in range(30)]
@@ -41,7 +41,7 @@ def plotdist(starttime,endtime):
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
 		plt.plot(h0_mean_array,p,'+')
-		plt.title('Probability Distribution for '+str(duration/(3600))+' hours')
+		plt.title('Probability Distribution for '+str(int(duration/(3600)))+' hours')
 		plt.xlabel('h0')
 		plt.ylabel('p')
 		pdf.savefig(fig1)
