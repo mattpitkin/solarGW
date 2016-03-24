@@ -36,6 +36,8 @@ else:
 #-------- Importing, filtering and timeshifting data ----------#
 gpsStartH = starttime
 durationH = endtime - starttime
+oldstarttime = starttime
+oldendtime = endtime
 gpsEndH   = endtime
 gpsStartL = gpsStartH
 durationL = durationH
@@ -63,6 +65,7 @@ lal.LALDetectorIndexLLODIFF}
 detH1 = lal.CachedDetectors[detMap['H1']]
 detL1 = lal.CachedDetectors[detMap['L1']]
 tgps = lal.LIGOTimeGPS(gpsStartH, 0)
+
 
 #---------- Get right ascension and declination of source in radians ----------#
 numseg30 = int((endtime-starttime)/30.)
@@ -96,7 +99,14 @@ for i in range(num_points):
 	newtimeL[i] = timeL[j]
 print num_points
 
-
+strainH = strainH[76800:-1]
+strainL = strainL[76800:-1]
+timeH = timeH[76800:-1]
+timeL = timeL[76800:-1]
+timel = timeL
+starttime = starttime + 76800
+durationH = endtime - starttime
+num_points = int(durationH/Xspacing)
 ############################################################
 #------------ Finding probability distribution ------------#
 #------- Defining some stuff for p ------#
@@ -170,5 +180,5 @@ if os.path.exists(wm)==False:
 else:
 	pass
 
-np.savetxt(wm+'/p'+str(starttime)+'.txt',p)
-np.savetxt(wm+'/h0'+str(starttime)+'.txt',h0_array)
+np.savetxt(wm+'/p'+str(oldstarttime)+'.txt',p)
+np.savetxt(wm+'/h0'+str(oldstarttime)+'.txt',h0_array)
