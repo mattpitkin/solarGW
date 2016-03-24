@@ -12,7 +12,7 @@ def plotdist(starttime,endtime):
 	timearray = np.array(np.loadtxt('/home/spxha/solarGW/intersect.txt',dtype='f8'))
 	StartTimes = timearray[:,0]
 	EndTimes   = timearray[:,1]
-	if starttime=='all' and endtime=='all:
+	if starttime=='all' and endtime=='all':
 		starttime = 931076896.0
 		endtime   = 971614889.0
 	duration = 0
