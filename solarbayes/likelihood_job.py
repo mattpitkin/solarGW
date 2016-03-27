@@ -29,8 +29,8 @@ if h0_max == 0.0001:
 	wm = 'w'
 elif h0_max == 0.00001:
 	wm = 'm'
-elif h0_max == 0.000006:
-	wm = 'all'
+elif h0_max == 0.000035:
+	wm = 'all/new/'
 else:
 	wm = str(h0_max)
 #-------- Importing, filtering and timeshifting data ----------#
@@ -104,7 +104,7 @@ strainL = strainL[76800:-1]
 timeH = timeH[76800:-1]
 timeL = timeL[76800:-1]
 timel = timeL
-starttime = starttime + 76800
+starttime = starttime + 150
 durationH = endtime - starttime
 num_points = int(durationH/Xspacing)
 ############################################################
