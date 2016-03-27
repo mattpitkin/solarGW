@@ -1,9 +1,16 @@
-def writetodag(starttime, endtime, h0max='adaptive'):
+def writetodag(starttime, endtime, h0max='adaptive',timelimit='none'):
 	import numpy as np
 	import os
 	fname1 = str(starttime)
 	fname2 = str(endtime)
-	timearray = np.array(np.loadtxt('../intersect.txt',dtype='f8'))
+	if timelimit=='none':
+		filepath='../intersect_old.txt'
+	elif timelimit=='30 mins':
+		filepath='../intersect.txt'
+	else:
+		print 'Error... illegal timelimit value'
+		exit()
+	timearray = np.array(np.loadtxt(filepath,dtype='f8'))
 	StartTimes = timearray[:,0]
 	EndTimes   = timearray[:,1]
 	if h0max=='adaptive':
@@ -12,7 +19,7 @@ def writetodag(starttime, endtime, h0max='adaptive'):
 		elif 'month' in endtime:
 			h0_max = 0.0001
 		elif 'all' in endtime:
-			h0_max = 0.000006
+			h0_max = 0.000035
 		else:
 			h0_max = h0max
 	elif h0max=='def':
@@ -43,7 +50,7 @@ def writetodag(starttime, endtime, h0max='adaptive'):
 	newEndTimes   =   EndTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes  -  endtime)).argmin()]
 
 	# Now everything is ready, write to a dag file
-	file = open("bayesjob"+fname1+'_'+fname2+".dag", "w")
+	file = open("bayesjob"+fname1+'_'+fname2+'_'+timelimit+".dag", "w")
 	for i in range(len(newStartTimes)):
 		file.write('JOB '+str(i+1)+' bayesjob.sub\n')
 		file.write('VARS '+str(i+1)+' starttime="'+str(int(newStartTimes[i]))+'" endtime="'+str(int(newEndTimes[i]))+'" h0="'+str(h0_max)+'"'+'\n')
