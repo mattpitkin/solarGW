@@ -9,7 +9,7 @@ def plotdist(starttime,endtime):
 	fname =	'probdist_'+starttime+'_'+endtime+'.pdf'
 	fname1 = str(starttime)
 	fname2 = str(endtime)
-	timearray = np.array(np.loadtxt('/home/spxha/solarGW/intersect.txt',dtype='f8'))
+	timearray = np.array(np.loadtxt('/home/spxha/solarGW/intersect_old.txt',dtype='f8'))
 	StartTimes = timearray[:,0]
 	EndTimes   = timearray[:,1]
 	if starttime=='all' and endtime=='all':
@@ -19,14 +19,18 @@ def plotdist(starttime,endtime):
 	newStartTimes = StartTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes-endtime)).argmin()]
 	newEndTimes   =   EndTimes[(np.abs(StartTimes-starttime)).argmin():(np.abs(EndTimes-endtime)).argmin()]
 	p_array,h0_array = [[[0 for _ in range(30)] for _ in range(len(newStartTimes))] for _ in range(2)]
+	j = 0
 	for i in range(len(newStartTimes)):
 		pathi = 'p'+str(int(newStartTimes[i]))+'.txt'
 		if os.path.exists(pathi)==True:
+			j +=1
+			print i
 			p_array[i]  = np.array(np.loadtxt('p'+str(int(newStartTimes[i]))+'.txt',dtype='float'))
 			h0_array[i] = np.array(np.loadtxt('h0'+str(int(newStartTimes[i]))+'.txt',dtype='float'))
 			duration += newEndTimes[i]-newStartTimes[i] - 150
 		else:
 			pass
+	print j
 	p_sum_array = [0.0 for _ in range(30)]
 	p_sum_array = np.array(p_sum_array)
 	h0_array = np.array(h0_array)
