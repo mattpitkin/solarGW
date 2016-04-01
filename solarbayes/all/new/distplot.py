@@ -7,9 +7,11 @@ def plotdist(starttime,endtime):
 	import matplotlib.pyplot as plt
 	import os
 	fname =	'probdist_'+starttime+'_'+endtime+'.pdf'
-	fname1 = str(starttime)
-	fname2 = str(endtime)
-	timearray = np.array(np.loadtxt('/home/spxha/solarGW/intersect_old.txt',dtype='f8'))
+	if os.path.exists('/home/spxha/')==True:
+		pathtointersect = '/home/spxha/solarGW/intersect_old.txt'
+	else:
+		pathtointersect = '../../../intersect_old.txt'
+	timearray = np.array(np.loadtxt(pathtointersect,dtype='f8'))
 	StartTimes = timearray[:,0]
 	EndTimes   = timearray[:,1]
 	if starttime=='all' and endtime=='all':
@@ -45,8 +47,8 @@ def plotdist(starttime,endtime):
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
 		plt.plot(h0_mean_array,p,'+')
-		plt.title('Probability Distribution for '+str(int(duration/(3600)))+' hours')
-		plt.xlabel('h0')
-		plt.ylabel('p')
+#		plt.title('Probability Distribution for '+str(int(duration/(3600)))+' hours')
+		plt.xlabel(r'$h_0$')
+		plt.ylabel('Normalised probability')
 		pdf.savefig(fig1)
 		plt.close()
