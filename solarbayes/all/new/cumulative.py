@@ -1,4 +1,4 @@
-# code to add up the probability for a month or a week, prints the duration, and plots the probability distribution
+# code to add up the probability for a month or a week, prints the duration, and plots the cumulative probability to infer the upper limit at x% confidence. Prints the upper limit on h0 at 95% confidence
 def plotdist(starttime,endtime):
 	# starttime and endtime should be in format 'week'+str(i) or 'month'+str(i) only.
 	# In the near future it will take 'all' as starttime and endtime to plot the entire data.
