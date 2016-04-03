@@ -1,4 +1,4 @@
-# code to add up the probability for a month or a week, prints the duration, and plots the cumulative probability to infer the upper limit with x% confidence. Prints the upper limit at 95% confidence.
+# code to add up the probability for a month or a week, prints the duration, and plots the cumulative probability to infer the upper limit at x% confidence. Prints the upper limit on h0 at 95% confidence
 def plotdist(starttime,endtime):
 	# starttime and endtime should be in format 'week'+str(i) or 'month'+str(i) only.
 	# In the near future it will take 'all' as starttime and endtime to plot the entire data.
@@ -7,9 +7,11 @@ def plotdist(starttime,endtime):
 	import matplotlib.pyplot as plt
 	import os
 	fname =	'probdist_cumulative.pdf'
-	fname1 = str(starttime)
-	fname2 = str(endtime)
-	timearray = np.array(np.loadtxt('/home/spxha/solarGW/intersect_old.txt',dtype='f8'))
+	if os.path.exists('/home/spxha/')==True:
+		pathtointersect = '/home/spxha/solarGW/intersect_old.txt'
+	else:
+		pathtointersect = '../../../intersect_old.txt'
+	timearray = np.array(np.loadtxt(pathtointersect,dtype='f8'))
 	StartTimes = timearray[:,0]
 	EndTimes   = timearray[:,1]
 	if starttime=='all' and endtime=='all':
@@ -44,17 +46,24 @@ def plotdist(starttime,endtime):
 
 	# Making a cumulative plot to get the 95% value.
 	prob = [0 for _ in range(len(p))]
-	for i in range(len(h0_array)):
+	for i in range(30):
+		d = [0 for _ in range(i+1)]
+		print i
 		for j in range(i+1):
-			d = [0 for _ in range(i+1)]
+			print i,j
 			d[j] = p[i-j]
+			print d[j]
 		prob[i] = np.sum(d)
+		print prob[i]
+	prob = prob/(np.max(prob))
+	print prob
 	# plot the distribution
 	with PdfPages(fname) as pdf:
 		fig1 = plt.figure()
-		plt.plot(h0_mean_array,p,'+')
-		plt.title('Probability Distribution for GPS'+str(starttime)+'_'+str(endtime))
-		plt.xlabel('h0')
-		plt.ylabel('Cumulative probability')
+		plt.plot(h0_mean_array,prob,'+')
+#		plt.title('Cumulative probability for '+str(int(duration/3600))+' hours')
+		plt.xlabel(r'$h_0$')
+		plt.ylabel('Normalised cumulative probability')
 		pdf.savefig(fig1)
 		plt.close()
+	print (h0_mean_array[10]+h0_mean_array[11])/2
