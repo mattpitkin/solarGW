@@ -2,7 +2,7 @@
 
 #------- Packages ---------#
 import numpy as np
-import astropy, gwpy, h5py, lal
+import astropy, gwpy, h5py, lal, sys, os
 from astropy.coordinates import get_sun
 import astropy.time as Time
 from matplotlib.backends.backend_pdf import PdfPages
@@ -13,7 +13,6 @@ from antres import antenna_response as ant_res
 from scipy.misc import logsumexp
 from notchfilt import get_filter_coefs, filter_data
 from optparse import OptionParser
-import sys, os
 
 # Read Macros
 parser = OptionParser()
@@ -29,8 +28,8 @@ if h0_max == 0.0001:
 	wm = 'w'
 elif h0_max == 0.00001:
 	wm = 'm'
-elif h0_max == 0.000035:
-	wm = 'all/new/'
+elif h0_max == 0.00002:
+	wm = 'all/forground'
 else:
 	wm = str(h0_max)
 #-------- Importing, filtering and timeshifting data ----------#
