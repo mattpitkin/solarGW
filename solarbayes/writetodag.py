@@ -19,7 +19,7 @@ def writetodag(starttime, endtime, h0max='adaptive',timelimit='none'):
 		elif 'month' in endtime:
 			h0_max = 0.0001
 		elif 'all' in endtime:
-			h0_max = 0.000035
+			h0_max = 0.00002
 		else:
 			h0_max = h0max
 	elif h0max=='def':
