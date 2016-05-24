@@ -53,5 +53,5 @@ def writetodag(starttime, endtime, h0max='adaptive',timelimit='none'):
 	file = open("bayesjob"+fname1+'_'+fname2+'_'+timelimit+".dag", "w")
 	for i in range(len(newStartTimes)):
 		file.write('JOB '+str(i+1)+' bayesjob.sub\n')
-		file.write('VARS '+str(i+1)+' starttime="'+str(int(newStartTimes[i]))+'" endtime="'+str(int(newEndTimes[i]))+'" h0="'+str(h0_max)+'"'+'\n')
+		file.write('VARS '+str(i+1)+' starttime="'+str(int(newStartTimes[i]))+'" endtime="'+str(int(newEndTimes[i]))+'" h0="'+str(h0_max)+'" Proc="'+str(i+1)+'"'+'\n')
 	file.close()

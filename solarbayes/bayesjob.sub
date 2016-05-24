@@ -1,10 +1,10 @@
 universe=vanilla
 getenv=True
 executable= /home/spxha/solarGW/solarbayes/likelihood_job.py
-arguments = --start $(starttime) --end $(endtime) --h0_max $(h0)
-log = /home/spxha/solarGW/solarbayes/likelihoodlog.txt
-output = /home/spxha/solarGW/solarbayes/likelihoodout.txt
-error = /home/spxha/solarGW/solarbayes/likelihooderror.txt
+arguments = --start $(starttime) --end $(endtime) --h0_max $(h0) --proc=$(Proc) --condor-cluster=$(Cluster)
+log = /home/spxha/solarGW/solarbayes/errorout/likelihoodlog.$(Cluster).$(Proc).txt
+output = /home/spxha/solarGW/solarbayes/errorout/likelihoodout.$(Cluster).$(Proc).txt
+error = /home/spxha/solarGW/solarbayes/errorout/err.$(Cluster).$(Proc).txt
 notification = never
 accounting_group = aluk.dev.s6.sgwb.solargw
 accounting_group_user = husni.almoubayyed

@@ -19,6 +19,8 @@ parser = OptionParser()
 parser.add_option("--start",   dest="starttime", type="int", help="GPS Start time")
 parser.add_option("--end",     dest="endtime",   type="int", help="GPS End Time")
 parser.add_option("--h0_max", dest="h0",   type="float", help="GPS End Time")
+parser.add_option("--condor-cluster", type="float",help="Cluster ID")
+parser.add_option("--proc", type="float", help="Job ID")
 (opts, args) = parser.parse_args()
 
 starttime = opts.starttime
