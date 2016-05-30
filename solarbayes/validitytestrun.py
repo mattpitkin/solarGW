@@ -25,9 +25,9 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	num_points = int(durationH/Xspacing)
 	h0_min=0.000001
 	h0_vals_num=30
-	wm = 'false_signal'
+	wm = 'fake_signal'
 
-	# Adding in a false signal
+	# Adding in a fake signal
 	# frequency in the middle of the range we're interested in 125 Hz
 	omega = 250.0*np.pi
 	amplitude = 0.5e-26 # (hopefully) middle of h0 values
@@ -60,13 +60,13 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	tdelay = np.append(tdelay,b)
 	newtimeL = newtimeL - tdelay
 
-	# add in false signal
-	falseL = amplitude*np.sin(omega*newtimeL)
-	falseH = amplitude*np.sin(omega*newtimeH)
+	# add in fake signal
+	fakeL = amplitude*np.sin(omega*newtimeL)
+	fakeH = amplitude*np.sin(omega*newtimeH)
 	newstrainL0=newstrainL[tdelayidx:len(newstrainL)]
 	newstrainH0=newstrainH[0:len(newstrainL0)]
-	strainH = strainH + falseH
-	strainL = strainL + falseL
+	strainH = strainH + fakeH
+	strainL = strainL + fakeL
 
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
@@ -255,3 +255,4 @@ def validity_test(starttime, endtime, h0_max=0.001):
 
 	np.savetxt(wm+'/p'+str(oldstarttime)+'.txt',p)
 	np.savetxt(wm+'/h0'+str(oldstarttime)+'.txt',h0_array)
+
