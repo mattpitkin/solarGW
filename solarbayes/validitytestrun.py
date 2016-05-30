@@ -12,8 +12,13 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	from scipy.misc import logsumexp
 	from notchfilt import get_filter_coefs, filter_data
 	from optparse import OptionParser
+	from progressbar import AnimatedMarker, Bar, BouncingBar, Counter, ETA, FileTransferSpeed, FormatLabel, Percentage, ProgressBar, ReverseBar, RotatingMarker, SimpleProgress, Timer, AdaptiveETA, AbsoluteETA, AdaptiveTransferSpeed
+
+	widgets = ['Finding Likelihood ', Percentage(), ' ', Bar(marker='#',left='[',right=']'),
+           ' ', AbsoluteETA(), ' ', AdaptiveTransferSpeed()]
 
 	#-------- Importing, filtering and timeshifting data ----------#
+	print 'Reading data'
 	durationH = endtime - starttime 	# same for durationL, but not used anyway
 	oldstarttime = starttime  			# for use later
 	oldendtime = endtime 				# for use later
@@ -34,6 +39,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	# the signal to introduce is of the form amplitude*np.sin(omega*t)
 	# first get timeL and timeH in synch with the sun's position
 
+	print 'Getting the detectors in sync'
 	timeH = np.arange(starttime, endtime, Xspacing)
 	timeL = timeH
 	detMap = {'H1': lal.LALDetectorIndexLHODIFF, 'L1':
@@ -61,6 +67,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	newtimeL = newtimeL - tdelay
 
 	# add in fake signal
+	print 'Insert fake signal'
 	fakeL = amplitude*np.sin(omega*newtimeL)
 	fakeH = amplitude*np.sin(omega*newtimeH)
 	newstrainL0=newstrainL[tdelayidx:len(newstrainL)]
@@ -71,12 +78,14 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
 	#----- Applying a bandpass filter -----#
+	print 'Filtering data'
 	coefsL = get_filter_coefs('L1')
 	coefsH = get_filter_coefs('H1')
 	strainL = filter_data(strainL,coefsL)
 	strainH = filter_data(strainH,coefsH)
 
 	#----------- Down-sampling ------------#
+	print 'Down-sampling'
 	Xspacing = Xspacing*32
 	num_points = int(durationH/Xspacing)
 	newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
@@ -101,6 +110,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	############################################################
 	#------------ Finding probability distribution ------------#
 	#   ------------ Defining some stuff for p -------------   #
+	print 'Finding likelihood Part 1/2'
 	numseg = int((durationH)/600)
 	segs = np.linspace(0,numseg,numseg+1)*600
 	segs = segs + newtimeL[0]
@@ -130,6 +140,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 
 	cos2pi, sin2pi = [[0 for _ in range(len(psi_array))] for _ in range(2)]
 	FpX, FcX, FpY, FcY = [[[0 for _ in range(num_points)] for _ in range(len(psi_array))] for _ in range(4)]
+	pbar = ProgressBar(widgets=widgets, max_value=len(psi_array)-1)
+    pbar.start()
 	for k in range(len(psi_array)):
 		cos2pi[k] = np.cos(2*psi_array[k])
 		sin2pi[k] = np.sin(2*psi_array[k])
@@ -138,6 +150,12 @@ def validity_test(starttime, endtime, h0_max=0.001):
 			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
+        pbar.update(k)
+    pbar.finish()
+    print
+	print 'Finding likelihoot Part 2/2. This will take a while... '
+	pbar = ProgressBar(widgets=widgets, max_value=num_points-1)
+	pbar.start()
 	for i in range(num_points):
 		d = np.array([dX[i], dY[i]])
 		d.shape = (2,1)
@@ -164,7 +182,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
 				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*np.log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 			p[0][j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
-
+		pbar.update(i)
+	pbar.finish()
 	################################
 	#--------- Background ---------#
 	################################
@@ -219,6 +238,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
+	pbar = ProgressBar(widgets=widgets, max_value=num_points-1)
+	pbar.start()
 	for i in range(num_points):
 		d = np.array([dX[i], dY[i]])
 		d.shape = (2,1)
@@ -245,6 +266,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
 				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*np.log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 			p[1][j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
+		pbar.update(i)
+	pbar.finish()
 
 
 	# Write into a file.
