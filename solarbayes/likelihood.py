@@ -118,7 +118,7 @@ def likelihood(starttime=969062862, endtime=969063995, h0_min=0.0000001, h0_max=
 	cos2pi, sin2pi = [[0 for _ in range(len(psi_array))] for _ in range(2)]
 	FpX, FcX, FpY, FcY = [[[0 for _ in range(num_points)] for _ in range(len(psi_array))] for _ in range(4)]
 	pbar = ProgressBar(widgets=widgets, max_value=len(psi_array)-1)
-        pbar.start()
+    pbar.start()
 	for k in range(len(psi_array)):
 		cos2pi[k] = np.cos(2*psi_array[k])
 		sin2pi[k] = np.sin(2*psi_array[k])
@@ -127,9 +127,9 @@ def likelihood(starttime=969062862, endtime=969063995, h0_min=0.0000001, h0_max=
 			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
-                pbar.update(k)
-        pbar.finish()
-        print
+        pbar.update(k)
+    pbar.finish()
+    print
 	print 'Finding likelihoot Part 2/2. This will take a while... '
 	pbar = ProgressBar(widgets=widgets, max_value=num_points-1)
 	pbar.start()

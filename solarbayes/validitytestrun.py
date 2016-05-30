@@ -1,5 +1,6 @@
 def validity_test(starttime, endtime, h0_max=0.001):
 	#------- Packages ---------#
+	print 'Importing packages' 
 	import numpy as np
 	import astropy, gwpy, h5py, lal, sys, os
 	from astropy.coordinates import get_sun
@@ -12,8 +13,13 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	from scipy.misc import logsumexp
 	from notchfilt import get_filter_coefs, filter_data
 	from optparse import OptionParser
+	from progressbar import AnimatedMarker, Bar, BouncingBar, Counter, ETA, FileTransferSpeed, FormatLabel, Percentage, ProgressBar, ReverseBar, RotatingMarker, SimpleProgress, Timer, AdaptiveETA, AbsoluteETA, AdaptiveTransferSpeed
+
+	widgets = ['Finding Likelihood ', Percentage(), ' ', Bar(marker='#',left='[',right=']'),
+           ' ', AbsoluteETA(), ' ', AdaptiveTransferSpeed()]
 
 	#-------- Importing, filtering and timeshifting data ----------#
+	print 'Reading data'
 	durationH = endtime - starttime 	# same for durationL, but not used anyway
 	oldstarttime = starttime  			# for use later
 	oldendtime = endtime 				# for use later
@@ -34,17 +40,18 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	# the signal to introduce is of the form amplitude*np.sin(omega*t)
 	# first get timeL and timeH in synch with the sun's position
 
+	print 'Getting the detectors in sync'
 	timeH = np.arange(starttime, endtime, Xspacing)
 	timeL = timeH
 	detMap = {'H1': lal.LALDetectorIndexLHODIFF, 'L1':
 	lal.LALDetectorIndexLLODIFF}
 	detH1 = lal.CachedDetectors[detMap['H1']]
 	detL1 = lal.CachedDetectors[detMap['L1']]
-	tgps = lal.LIGOTimeGPS(gpsStartH, 0)
+	tgps = lal.LIGOTimeGPS(starttime, 0)
 
 	#---------- Get right ascension and declination of source in radians ----------#
 	numseg30 = int((endtime-starttime)/30.)
-	seg30 = gpsStartH + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
+	seg30 = starttime + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
 	tdelay = [[0] for _ in range(numseg30)]
 	for i in range(numseg30-1):
 		if ((timeL[int(i/Xspacing)]>seg30[i])&(timeL[int(i/Xspacing)]<seg30[i+1])):
@@ -58,34 +65,37 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	# make sure tdelay and timeL are of same length in case integer-ing caused slight inconsistency.
 	b = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
 	tdelay = np.append(tdelay,b)
-	newtimeL = newtimeL - tdelay
+	newtimeL = timeL - tdelay
 
 	# add in fake signal
+	print 'Insert fake signal'
 	fakeL = amplitude*np.sin(omega*newtimeL)
-	fakeH = amplitude*np.sin(omega*newtimeH)
-	newstrainL0=newstrainL[tdelayidx:len(newstrainL)]
-	newstrainH0=newstrainH[0:len(newstrainL0)]
-	strainH = strainH + fakeH
-	strainL = strainL + fakeL
+	fakeH = amplitude*np.sin(omega*timeH)
+	newstrainL0 = strainL[tdelayidx:len(strainL)]
+	newstrainH0 = strainH[0:len(strainL0)]
+	newstrainH0 = newstrainH0 + fakeH
+	newstrainL0 = newstrainL0 + fakeL
 
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 
 	#----- Applying a bandpass filter -----#
+	print 'Filtering data'
 	coefsL = get_filter_coefs('L1')
 	coefsH = get_filter_coefs('H1')
-	strainL = filter_data(strainL,coefsL)
-	strainH = filter_data(strainH,coefsH)
+	newerstrainL0 = filter_data(newstrainL0,coefsL)
+	newerstrainH0 = filter_data(newstrainH0,coefsH)
 
 	#----------- Down-sampling ------------#
+	print 'Down-sampling'
 	Xspacing = Xspacing*32
 	num_points = int(durationH/Xspacing)
-	newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
+	newtimeL, newtimeH, newerstrainH, newerstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
 	for i in range(num_points):
 		j = 32*i + 16
-		newstrainH[i] = np.mean(strainH[j-16:j+16])
-		newstrainL[i] = np.mean(strainL[j-16:j+16])
-		newtimeH[i] = timeH[j]
-		newtimeL[i] = timeL[j]
+		newstrainH[i] = np.mean(newstrainH0[j-16:j+16])
+		newstrainL[i] = np.mean(newstrainL0[j-16:j+16])
+		newtimeH[i] = newtimeH[j]
+		newtimeL[i] = newtimeL[j]
 
 	newstrainH = newstrainH[76800:len(newstrainH)]
 	newstrainL = newstrainL[76800:len(newstrainL)]
@@ -101,6 +111,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	############################################################
 	#------------ Finding probability distribution ------------#
 	#   ------------ Defining some stuff for p -------------   #
+	print 'Finding likelihood Part 1/2'
 	numseg = int((durationH)/600)
 	segs = np.linspace(0,numseg,numseg+1)*600
 	segs = segs + newtimeL[0]
@@ -130,6 +141,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 
 	cos2pi, sin2pi = [[0 for _ in range(len(psi_array))] for _ in range(2)]
 	FpX, FcX, FpY, FcY = [[[0 for _ in range(num_points)] for _ in range(len(psi_array))] for _ in range(4)]
+	pbar = ProgressBar(widgets=widgets, max_value=len(psi_array)-1)
+	pbar.start()
 	for k in range(len(psi_array)):
 		cos2pi[k] = np.cos(2*psi_array[k])
 		sin2pi[k] = np.sin(2*psi_array[k])
@@ -138,6 +151,12 @@ def validity_test(starttime, endtime, h0_max=0.001):
 			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
+        pbar.update(k)
+	pbar.finish()
+	print
+	print 'Finding likelihoot Part 2/2. This will take a while... '
+	pbar = ProgressBar(widgets=widgets, max_value=num_points-1)
+	pbar.start()
 	for i in range(num_points):
 		d = np.array([dX[i], dY[i]])
 		d.shape = (2,1)
@@ -164,7 +183,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
 				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*np.log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 			p[0][j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
-
+		pbar.update(i)
+	pbar.finish()
 	################################
 	#--------- Background ---------#
 	################################
@@ -172,7 +192,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	ra_background, background_tdelay, dec_background, coords_background = [[[0] for _ in range(10)] for _ in range(4)]
 	background_intervals = background_intervals.astype(int)
 	for j in range(len(background_intervals)):
-		coords_background[j]=get_sun(Time.Time(gpsStartH-background_intervals[j],format='gps'))
+		coords_background[j]=get_sun(Time.Time(starttime-background_intervals[j],format='gps'))
 		ra_background[j]  = coords_background[j].ra.hour  * np.pi/12
 		dec_background[j] = coords_background[j].dec.hour * np.pi/12
 		background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background[j], dec_background[j], tgps)
@@ -219,6 +239,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
+	pbar = ProgressBar(widgets=widgets, max_value=num_points-1)
+	pbar.start()
 	for i in range(num_points):
 		d = np.array([dX[i], dY[i]])
 		d.shape = (2,1)
@@ -245,6 +267,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
 				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*np.log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 			p[1][j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
+		pbar.update(i)
+	pbar.finish()
 
 
 	# Write into a file.
