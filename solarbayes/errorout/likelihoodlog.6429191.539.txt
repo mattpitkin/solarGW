@@ -1,0 +1,27 @@
+000 (6429191.000.000) 06/01 02:51:21 Job submitted from host: <172.20.0.15:55462?addrs=172.20.0.15-55462>
+    DAG Node: 539
+...
+001 (6429191.000.000) 06/01 02:51:24 Job executing on host: <172.20.0.53:52640?addrs=172.20.0.53-52640>
+...
+006 (6429191.000.000) 06/01 02:51:32 Image size of job updated: 748296
+	223  -  MemoryUsage of job (MB)
+	228100  -  ResidentSetSize of job (KB)
+...
+006 (6429191.000.000) 06/01 02:52:06 Image size of job updated: 1537768
+	223  -  MemoryUsage of job (MB)
+	228100  -  ResidentSetSize of job (KB)
+...
+004 (6429191.000.000) 06/01 02:52:06 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:38, Sys 0 00:00:01  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :       12       12    610236
+	   Memory (MB)          :      223        1         1
+...
+009 (6429191.000.000) 06/01 02:52:06 Job was aborted by the user.
+	removed because <OtherJobRemoveRequirements = DAGManJobId =?= 6428652> fired when job (6428652.0) was removed
+...
