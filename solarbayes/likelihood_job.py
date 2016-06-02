@@ -24,8 +24,8 @@ parser.add_option("--proc", type="float", help="Job ID")
 (opts, args) = parser.parse_args()
 
 starttime = opts.starttime
-endtime = opts.endtime
-h0_max = opts.h0
+endtime   = opts.endtime
+h0_max    = opts.h0
 if h0_max == 0.0001:
 	wm = 'w'
 elif h0_max == 0.00001:
@@ -35,88 +35,91 @@ elif h0_max == 0.00002:
 else:
 	wm = str(h0_max)
 #-------- Importing, filtering and timeshifting data ----------#
-gpsStartH = starttime
-durationH = endtime - starttime
+gpsStartH    = starttime
+durationH    = endtime - starttime
 oldstarttime = starttime
-oldendtime = endtime
-gpsEndH   = endtime
-gpsStartL = gpsStartH
-durationL = durationH
-gpsEndL   = gpsEndH
-Xspacing = 2.44140625E-4
-gpsTime = np.linspace(starttime,endtime,int(1/Xspacing))
-pathtoinput = "/home/spxha/"
-strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
-strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
-num_points = int(durationH/Xspacing)
-h0_min=0.0000001
-h0_vals_num=30
+oldendtime   = endtime
+gpsEndH      = endtime
+gpsStartL    = gpsStartH
+durationL    = durationH
+gpsEndL      = gpsEndH
+Xspacing     = 2.44140625E-4
+gpsTime      = np.linspace(starttime,endtime,int(1/Xspacing))
+pathtoinput  = "/home/spxha/"
+strainH      = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
+strainL      = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
+num_points   = int(durationH/Xspacing)
+h0_min       = 0.0000001
+h0_vals_num  = 30
 #----------------------------
 # Applying a bandpass filter
 #----------------------------
-coefsL = get_filter_coefs('L1')
-coefsH = get_filter_coefs('H1')
+coefsL  = get_filter_coefs('L1')
+coefsH  = get_filter_coefs('H1')
 strainL = filter_data(strainL,coefsL)
 strainH = filter_data(strainH,coefsH)
-
-timeH = np.arange(gpsStartH, gpsEndH, Xspacing)
-timeL = np.arange(gpsStartL, gpsEndL, Xspacing)
-detMap = {'H1': lal.LALDetectorIndexLHODIFF, 'L1':
+timeH   = np.arange(gpsStartH, gpsEndH, Xspacing)
+timeL   = np.arange(gpsStartL, gpsEndL, Xspacing)
+detMap  = {'H1': lal.LALDetectorIndexLHODIFF, 'L1':
 lal.LALDetectorIndexLLODIFF}
-detH1 = lal.CachedDetectors[detMap['H1']]
-detL1 = lal.CachedDetectors[detMap['L1']]
-tgps = lal.LIGOTimeGPS(gpsStartH, 0)
-
+detH1  = lal.CachedDetectors[detMap['H1']]
+detL1  = lal.CachedDetectors[detMap['L1']]
+tgps   = lal.LIGOTimeGPS(gpsStartH, 0)
 
 #---------- Get right ascension and declination of source in radians ----------#
 numseg30 = int((endtime-starttime)/30.)
-seg30 = gpsStartH + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
-tdelay = [[0] for _ in range(numseg30)]
+seg30    = gpsStartH + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
+tdelay   = [[0] for _ in range(numseg30)]
 for i in range(numseg30-1):
-	if ((timeL[int(i/Xspacing)]>seg30[i])&(timeL[int(i/Xspacing)]<seg30[i+1])):
-		coordstime=seg30[i]
-		coords = get_sun(Time.Time(coordstime,format='gps'))
-		tdelay[i] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
-	else:
-		pass
-tdelay = np.repeat(tdelay,int(30/Xspacing))
-
+	for j in range(int(len(timeL)*Xspacing)):
+		if ((timeL[j/Xspacing]>seg30[i])&(timeL[j/Xspacing]<seg30[i+1])):
+			coordstime=seg30[i]
+			coords = get_sun(Time.Time(coordstime,format='gps'))
+			tdelay[i] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
+coordstime = seg30[-1]
+coords     = get_sun(Time.Time(coordstime,format='gps'))
+tdelay[-1] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
+tdelay     = np.array(tdelay)
+tdelay     = np.repeat(tdelay,int(30/Xspacing))
 # make sure tdelay and timeL are of same length in case integer-ing caused slight inconsistency.
-b = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
+b      = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
 tdelay = np.append(tdelay,b)
-
-
 # H1 and L1 are now in sync and filtered between 100 and 150 Hz.
-
 #----------- Down-sampling ------------#
-Xspacing = Xspacing*32
+Xspacing   = Xspacing*8
 num_points = int(durationH/Xspacing)
-newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
+newtdelay, newtimeL, newtimeH, newstrainH, newstrainL = [[0 for _ in range(num_points)] for _ in range(5)]
 for i in range(num_points):
-	j = 32*i + 16
-	newstrainH[i] = np.mean(strainH[j-16:j+16])
-	newstrainL[i] = np.mean(strainL[j-16:j+16])
-	newtimeH[i] = timeH[j]
-	newtimeL[i] = timeL[j]
-
+	j = 8*i + 4
+	newstrainH[i] = np.mean(strainH[j-4:j+4])
+	newstrainL[i] = np.mean(strainL[j-4:j+4])
+	newtimeH[i]   = timeH[j]
+	newtimeL[i]   = timeL[j]
+	newtdelay[i]  = tdelay[j]
 newstrainH = newstrainH[76800:len(newstrainH)]
 newstrainL = newstrainL[76800:len(newstrainL)]
-newtimeH = newtimeH[76800:-1]
-newtimeL = newtimeL[76800:-1]
-newtimel = newtimeL
-starttime = starttime + 150
-durationH = newtimeH[0] - newtimeH[len(newtimeH)]
+newtimeH   = newtimeH[76800:len(newtimeH)]
+newtimeL   = newtimeL[76800:len(newtimeL)]
+newtdelay  = newtdelay[76800:len(newtdelay)]
+newtimel   = newtimeL
+starttime  = starttime + 150
+durationH  = int(newtimeH[-1]) - int(newtimeH[0])
 num_points = int(durationH/Xspacing)
-tdelayidx = int(tdelay / Xspacing)
+tdelayidx  = [0 for _ in range(len(newtdelay))]
+for i in range(len(newtdelay)):
+        tdelayidx[i] = int(newtdelay[i]*Xspacing)
+idxmax= np.max(tdelayidx)
+newstrainL0,newstrainH0 = [[0 for _ in range(len(newtdelay)-idxmax)] for _ in range(2)]
+for i in range(idxmax,len(newtdelay)):
+        newstrainL0[i-idxmax]=newstrainL[i-tdelayidx[i]]
 
-newstrainL0=newstrainL[tdelayidx:len(newstrainL)]
 newstrainH0=newstrainH[0:len(newstrainL0)]
 ############################################################
 #------------ Finding probability distribution ------------#
 #   ------------ Defining some stuff for p -------------   #
 numseg = int((durationH)/600)
 segs = np.linspace(0,numseg,numseg+1)*600
-newtimeL = newtimeL - tdelay
+newtimeL = np.array(newtimeL) - np.array(newtdelay)
 segs = segs + newtimeL[0]
 ra,dec,fp,fc = [[0 for _ in range(numseg+1)] for _ in range(4)]
 for i in range(numseg+1):
@@ -127,8 +130,8 @@ for i in range(numseg+1):
 psi_array = np.linspace(0,np.pi,10)
 dpsi = psi_array[1]-psi_array[0]
 sigmaA = 10.0
-h0min = h0_min*np.std(newstrainH)
-h0max = h0_max*np.std(newstrainH)
+h0min = h0_min*np.std(newstrainH0)
+h0max = h0_max*np.std(newstrainH0)
 h0_array = np.linspace(h0min,h0max,h0_vals_num)
 invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 detSigma0 = sigmaA**4
@@ -183,20 +186,25 @@ for i in range(num_points):
 #--------- Background ---------#
 ################################
 background_intervals = np.linspace(1,10,10)*9000
-ra_background, background_tdelay, dec_background, coords_background = [[[0] for _ in range(10)] for _ in range(4)]
+background_tdelay = [[0] for _ in range(10)]
 background_intervals = background_intervals.astype(int)
 for j in range(len(background_intervals)):
-	coords_background[j]=get_sun(Time.Time(gpsStartH-background_intervals[j],format='gps'))
-	ra_background[j]  = coords_background[j].ra.hour  * np.pi/12
-	dec_background[j] = coords_background[j].dec.hour * np.pi/12
+	coords_background = get_sun(Time.Time(gpsStartH-background_intervals[j],format='gps'))
+	ra_background     = coords_background.ra.hour  * np.pi/12
+	dec_background    = coords_background.dec.hour * np.pi/12
 	background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background[j], dec_background[j], tgps)
 
 
 for ii in range(10):
-	tdelayidx = int(background_tdelay[ii] / Xspacing)
-	newstrainL=newstrainL[tdelayidx:len(newstrainL)]
-	if len(newstrainL)<len(newstrainH):
-		newstrainH=newstrainH[0:len(newstrainL)]
+	tdelayidx  = [0 for _ in range(len(newtdelay))]
+	for f in range(len(newtdelay)):
+		tdelayidx[f] = int(background_tdelay[ii][f]*Xspacing)
+	idxmax = np.max(tdelayidx)
+	newstrainL,newstrainH = [[0 for _ in range(len(newtdelay)-idxmax)] for _ in range(2)]
+	for ss in range(idxmax,len(newtdelay)):
+		newstrainL[ss-idxmax]=newstrainL[ss-tdelayidx[ss]]
+	newstrainH = newstrainH[0:len(newstrainL)]
+	durationH  = endtime-starttime-background_tdelay[ii]
 	numseg = int((durationH)/600)
 	segs = np.linspace(0,numseg,numseg+1)*600
 	segs = segs + newtimeL[0]
