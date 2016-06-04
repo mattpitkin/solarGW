@@ -192,7 +192,7 @@ for j in range(len(background_intervals)):
 	coords_background = get_sun(Time.Time(gpsStartH-background_intervals[j],format='gps'))
 	ra_background     = coords_background.ra.hour  * np.pi/12
 	dec_background    = coords_background.dec.hour * np.pi/12
-	background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background[j], dec_background[j], tgps)
+	background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background, dec_background, tgps)
 
 
 for ii in range(10):
