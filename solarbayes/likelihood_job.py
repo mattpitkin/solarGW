@@ -35,16 +35,10 @@ elif h0_max == 0.00002:
 else:
 	wm = str(h0_max)
 #-------- Importing, filtering and timeshifting data ----------#
-gpsStartH    = starttime
 durationH    = endtime - starttime
 oldstarttime = starttime
 oldendtime   = endtime
-gpsEndH      = endtime
-gpsStartL    = gpsStartH
-durationL    = durationH
-gpsEndL      = gpsEndH
 Xspacing     = 2.44140625E-4
-gpsTime      = np.linspace(starttime,endtime,int(1/Xspacing))
 pathtoinput  = "/home/spxha/"
 strainH      = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
 strainL      = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
@@ -58,17 +52,17 @@ coefsL  = get_filter_coefs('L1')
 coefsH  = get_filter_coefs('H1')
 strainL = filter_data(strainL,coefsL)
 strainH = filter_data(strainH,coefsH)
-timeH   = np.arange(gpsStartH, gpsEndH, Xspacing)
-timeL   = np.arange(gpsStartL, gpsEndL, Xspacing)
+timeH   = np.arange(starttime, endtime, Xspacing)
+timeL   = timeH
 detMap  = {'H1': lal.LALDetectorIndexLHODIFF, 'L1':
 lal.LALDetectorIndexLLODIFF}
 detH1  = lal.CachedDetectors[detMap['H1']]
 detL1  = lal.CachedDetectors[detMap['L1']]
-tgps   = lal.LIGOTimeGPS(gpsStartH, 0)
+tgps   = lal.LIGOTimeGPS(starttime, 0)
 
 #---------- Get right ascension and declination of source in radians ----------#
 numseg30 = int((endtime-starttime)/30.)
-seg30    = gpsStartH + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
+seg30    = starttime + 30*np.linspace(1,numseg30,numseg30) # 30 second update rate
 tdelay   = [[0] for _ in range(numseg30)]
 for i in range(numseg30-1):
 	for j in range(int(len(timeL)*Xspacing)):
@@ -78,6 +72,7 @@ for i in range(numseg30-1):
 			tdelay[i] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
 coordstime = seg30[-1]
 coords     = get_sun(Time.Time(coordstime,format='gps'))
+del coords, coordstime, seg30
 tdelay[-1] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
 tdelay     = np.array(tdelay)
 tdelay     = np.repeat(tdelay,int(30/Xspacing))
@@ -96,12 +91,12 @@ for i in range(num_points):
 	newtimeH[i]   = timeH[j]
 	newtimeL[i]   = timeL[j]
 	newtdelay[i]  = tdelay[j]
+del strainL, strainH, tdelay, timeL, timeH
 newstrainH = newstrainH[76800:len(newstrainH)]
 newstrainL = newstrainL[76800:len(newstrainL)]
 newtimeH   = newtimeH[76800:len(newtimeH)]
 newtimeL   = newtimeL[76800:len(newtimeL)]
 newtdelay  = newtdelay[76800:len(newtdelay)]
-newtimel   = newtimeL
 starttime  = starttime + 150
 durationH  = int(newtimeH[-1]) - int(newtimeH[0])
 num_points = int(durationH/Xspacing)
@@ -137,10 +132,11 @@ invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 detSigma0 = sigmaA**4
 dX = newstrainH0
 dY = newstrainL0
+
 FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(num_points)] for _ in range(4)]
 for i in range(num_points):
-	FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
-	FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
+	FpX0[i], FcX0[i] = ant_res(newtimeH[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
+	FpY0[i], FcY0[i] = ant_res(newtimeL[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
 p = [[0  for _ in range(len(h0_array))] for _ in range(11)]
 ppsi = [0 for _ in range(len(psi_array))]
 logdpsi_2 = np.log(0.5*dpsi)
@@ -155,8 +151,9 @@ for k in range(len(psi_array)):
 		FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
 		FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
 		FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
+
 for i in range(num_points):
-	d = np.array([dX[i], dY[i]])
+	d = np.array([newstrainH0[i], newstrainL0[i]])
 	d.shape = (2,1)
 	if (i + int(60/Xspacing)<num_points):
 		int1 = i + int(60/Xspacing)
@@ -189,12 +186,12 @@ background_intervals = np.linspace(1,10,10)*9000
 background_tdelay = [[0] for _ in range(10)]
 background_intervals = background_intervals.astype(int)
 for j in range(len(background_intervals)):
-	coords_background = get_sun(Time.Time(gpsStartH-background_intervals[j],format='gps'))
+	coords_background = get_sun(Time.Time(starttime-background_intervals[j],format='gps'))
 	ra_background     = coords_background.ra.hour  * np.pi/12
 	dec_background    = coords_background.dec.hour * np.pi/12
 	background_tdelay[j] = lal.ArrivalTimeDiff(detH1.location, detL1.location, ra_background, dec_background, tgps)
 
-
+del background_intervals, ra_background, dec_background, coords_background
 for ii in range(10):
 	tdelayidx  = [0 for _ in range(len(newtdelay))]
 	for f in range(len(newtdelay)):
@@ -215,35 +212,9 @@ for ii in range(10):
 		coords = get_sun(Time.Time(coordstime,format='gps'))
 		ra[i] = coords.ra.hour*np.pi/12
 		dec[i] = coords.dec.hour*np.pi/12
-	psi_array = np.linspace(0,np.pi,10)
-	dpsi = psi_array[1]-psi_array[0]
-	sigmaA = 10.0
-	h0min = h0_min*np.std(newstrainH)
-	h0max = h0_max*np.std(newstrainH)
-	h0_array = np.linspace(h0min,h0max,h0_vals_num)
-	invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
-	detSigma0 = sigmaA**4
-	dX = newstrainH
-	dY = newstrainL
-	FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(num_points)] for _ in range(4)]
-	for i in range(num_points):
-		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
-		FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
-	ppsi = [0 for _ in range(len(psi_array))]
-	logdpsi_2 = np.log(0.5*dpsi)
 
-	cos2pi, sin2pi = [[0 for _ in range(len(psi_array))] for _ in range(2)]
-	FpX, FcX, FpY, FcY = [[[0 for _ in range(num_points)] for _ in range(len(psi_array))] for _ in range(4)]
-	for k in range(len(psi_array)):
-		cos2pi[k] = np.cos(2*psi_array[k])
-		sin2pi[k] = np.sin(2*psi_array[k])
-		for i in range(num_points):
-			FpX[k][i] = FpX0[i]*cos2pi[k] + FcX0[i]*sin2pi[k]
-			FcX[k][i] = FcX0[i]*cos2pi[k] - FpX0[i]*sin2pi[k]
-			FpY[k][i] = FpY0[i]*cos2pi[k] + FcY0[i]*sin2pi[k]
-			FcY[k][i] = FcY0[i]*cos2pi[k] - FpY0[i]*sin2pi[k]
 	for i in range(num_points):
-		d = np.array([dX[i], dY[i]])
+		d = np.array([newstrainH[i], newstrainL[i]])
 		d.shape = (2,1)
 		if (i + int(60/Xspacing)<num_points):
 			int1 = i + int(60/Xspacing)
@@ -268,7 +239,7 @@ for ii in range(10):
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
 				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*np.log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
 			p[ii+1][j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
-
+	del newstrainL, newstrainH
 
 # Write into a file.
 if os.path.exists(wm)==False:
