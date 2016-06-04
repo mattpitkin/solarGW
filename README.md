@@ -1,6 +1,8 @@
 # solarGW
 This repository is for analysing LIGO data (we're currently analysing S6 data which is available publicly at losc.ligo.org) to investigate gravitational waves from our Sun.
 
-Files in main directory include code used in a simple *cross-correlation* method, while files in solarbayes/ include code used in a Bayesian approach to detecting gravitational waves from the Sun.
+Currently working on code in solarbays/, a Bayesian approach in measuring the credibility of detecting gravitational waves from the Sun. Main routine at solarbays/likelihood_job. 
 
-The main routines are respectively batchstrain_bg.py and likelihood_job.py... start there if you would like to know more.
+Old code at simplistic/, a simplistic approach to detecting gravitational waves, from the cross-correlation of the signals in the two detecotors when pointing at the Sun. Main routine at simplistic/batchstrain_bg.py
+
+Will add more documentation soon, and create an IPython notebook with all the analysis code. Analysis_Notebook.ipynb, in the mean time check www.husni.space/#!research/c1t44
