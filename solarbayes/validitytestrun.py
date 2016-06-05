@@ -66,9 +66,30 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	# make sure tdelay and timeL are of same length in case integer-ing caused slight inconsistency.
 	b = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
 	tdelay = np.append(tdelay,b)
-	newtimeL = timeL - tdelay
+	timeL = timeL - tdelay
 
-	# add in fake signal
+	#------------ Down-sampling ------------#
+	print 'Down-sampling'
+	Xspacing = Xspacing*32
+	num_points = int(durationH/Xspacing)
+	newtimeL, newtimeH, newerstrainH, newerstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
+	for i in range(num_points):
+		j = 8*i + 4
+		newstrainH[i] = np.mean(strainH[j-4:j+4])
+		newstrainL[i] = np.mean(strainL[j-4:j+4])
+		newtimeH[i]   = timeH[j]
+		newtimeL[i]   = timeL[j]
+		newtdelay[i]  = tdelay[j]
+
+	newstrainH = newstrainH[76800:len(newstrainH)]
+	newstrainL = newstrainL[76800:len(newstrainL)]
+	newtimeH   = newtimeH[76800:-1]
+	newtimeL   = newtimeL[76800:-1]
+	starttime  = starttime + 150
+	durationH  = int(newtimeH[-1]) - int(newtimeH[0])
+	num_points = int(durationH/Xspacing)
+	del timeL, timeH, tdelay, strainH, strainL
+	#----------- add in fake signal ------------#
 	print 'Insert fake signal'
 	FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(num_points)] for _ in range(4)]
 	for i in range(num_points):
@@ -83,7 +104,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 		FpY[i] = FpY0[i]*cos2pi1 + FcY0[i]*sin2pi1
 		FcY[i] = FcY0[i]*cos2pi1 - FpY0[i]*sin2pi1
 
-	fakeH = amplitude*(FpX*np.sin(omega*timeH)    + FcX*np.cos(omega*timeH))
+	fakeH = amplitude*(FpX*np.sin(omega*newtimeH) + FcX*np.cos(omega*newtimeH))
 	fakeL = amplitude*(FpY*np.sin(omega*newtimeL) + FcY*np.cos(omega*newtimeL))
 	tdelayidx  = [0 for _ in range(len(tdelay))]
 	for i in range(len(tdelay)):
@@ -96,38 +117,15 @@ def validity_test(starttime, endtime, h0_max=0.001):
 
 	newstrainH0 = newstrainH0 + fakeH
 	newstrainL0 = newstrainL0 + fakeL
-
+	del newstrainL, newstrainH
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 	del FcX,FcX0,FpX,FpX0,FcY,FcY0,FpY,FpY0
 	#----- Applying a bandpass filter -----#
 	print 'Filtering data'
 	coefsL = get_filter_coefs('L1')
 	coefsH = get_filter_coefs('H1')
-	newerstrainL0 = filter_data(newstrainL0,coefsL)
-	newerstrainH0 = filter_data(newstrainH0,coefsH)
-
-	#----------- Down-sampling ------------#
-	print 'Down-sampling'
-	Xspacing = Xspacing*32
-	num_points = int(durationH/Xspacing)
-	newtimeL, newtimeH, newerstrainH, newerstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
-	for i in range(num_points):
-		j = 8*i + 4
-		newstrainH[i] = np.mean(newstrainH0[j-4:j+4])
-		newstrainL[i] = np.mean(newstrainL0[j-4:j+4])
-		newtimeH[i] = newtimeH[j]
-		newtimeL[i] = newtimeL[j]
-		newtdelay[i]  = tdelay[j]
-
-	newstrainH = newstrainH[76800:len(newstrainH)]
-	newstrainL = newstrainL[76800:len(newstrainL)]
-	newtimeH = newtimeH[76800:-1]
-	newtimeL = newtimeL[76800:-1]
-	newtimel = newtimeL
-	starttime = starttime + 150
-	durationH  = int(newtimeH[-1]) - int(newtimeH[0])
-	num_points = int(durationH/Xspacing)
-
+	newerstrainL = filter_data(newstrainL0,coefsL)
+	newerstrainH = filter_data(newstrainH0,coefsH)
 
 	############################################################
 	#------------ Finding probability distribution ------------#
