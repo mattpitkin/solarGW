@@ -5,9 +5,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	import astropy, gwpy, h5py, lal, sys, os
 	from astropy.coordinates import get_sun
 	import astropy.time as Time
-	from matplotlib.backends.backend_pdf import PdfPages
 	from scipy.signal import butter, filtfilt
-	import matplotlib.pyplot as plt
 	from gwpy.timeseries import TimeSeries
 	from antres import antenna_response as ant_res
 	from scipy.misc import logsumexp
@@ -27,7 +25,6 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	num_points = int(durationH/Xspacing)
 	h0_min=0.000001
 	h0_vals_num=30
-	wm = 'fake_signal'
 
 	# Adding in a fake signal
 	# frequency in the middle of the range we're interested in 125 Hz
@@ -86,6 +83,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	newstrainL = newstrainL[76800:len(newstrainL)]
 	newtimeH   = newtimeH[76800:len(newtimeH)]
 	newtimeL   = newtimeL[76800:len(newtimeL)]
+	newtdelay = newtdelay[76800:len(newtdelay)]
 	starttime  = starttime + 150
 	durationH  = int(newtimeH[-1]) - int(newtimeH[0])
 	num_points = int(durationH/Xspacing)
@@ -93,9 +91,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	#----------- add in fake signal ------------#
 	newtimeH = newtimeH[0:num_points]
 	newtimeL = newtimeL[0:num_points]
+	newtdelay = newtdelay[0:num_points]
 	print 'Insert fake signal'
-	print 'num_points ', num_points
-	print 'len(newtimeL) ',len(newtimeL)
         numseg = int((durationH)/600)
         segs = np.linspace(0,numseg,numseg+1)*600
         segs = segs + newtimeL[0]
@@ -125,6 +122,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	for i in range(len(newtdelay)):
 		tdelayidx[i] = int(newtdelay[i]*Xspacing)
 	idxmax= np.max(tdelayidx)
+	print len(newtdelay), len(newstrainL)
 	newstrainL0,newstrainH0 = [[0 for _ in range(len(newtdelay)-idxmax)] for _ in range(2)]
 	for i in range(idxmax,len(newtdelay)):
 		newstrainL0[i-idxmax]=newstrainL[i-tdelayidx[i]]
@@ -132,16 +130,18 @@ def validity_test(starttime, endtime, h0_max=0.001):
 
 	newstrainH0 = newstrainH0 + fakeH
 	newstrainL0 = newstrainL0 + fakeL
-	del newstrainL, newstrainH
+	del newstrainL, newstrainH, fakeL, fakeH
 	# H1 and L1 are now in sync and filtered between 100 and 150 Hz.
 	del FcX,FcX0,FpX,FpX0,FcY,FcY0,FpY,FpY0
 	#----- Applying a bandpass filter -----#
 	print 'Filtering data'
 	coefsL = get_filter_coefs('L1')
 	coefsH = get_filter_coefs('H1')
-	newerstrainL = filter_data(newstrainL0,coefsL)
-	newerstrainH = filter_data(newstrainH0,coefsH)
-
+	newstrainL0 = np.array(newstrainL0)
+	newstrainH0 = np.array(newstrainH0)
+	newstrainL = filter_data(newstrainL0,coefsL)
+	newstrainH = filter_data(newstrainH0,coefsH)
+	del coefsL, coefsH
 	############################################################
 	#------------ Finding probability distribution ------------#
 	#   ------------ Defining some stuff for p -------------   #
@@ -154,8 +154,9 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	h0_array = np.linspace(h0min,h0max,h0_vals_num)
 	invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 	detSigma0 = sigmaA**4
-	dX = newstrainH0
-	dY = newstrainL0
+	dX = newstrainH
+	dY = newstrainL
+	del newstrainH, newstrainL, newstrainH0, newstrainL0, newtimeL, newtimeH
 	FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(num_points)] for _ in range(4)]
 	for i in range(num_points):
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
@@ -204,6 +205,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 
 
 	# Write into a file.
+	wm = 'all/siginj'
 	if os.path.exists(wm)==False:
 		os.mkdir(wm)
 	else:
