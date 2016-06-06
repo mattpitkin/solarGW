@@ -1,4 +1,4 @@
-def validity_test(starttime, endtime, h0_max=0.0001):
+def validity_test(starttime, endtime, h0_max=0.001):
 	#------- Packages ---------#
 	print 'Importing packages'
 	import numpy as np
@@ -23,7 +23,7 @@ def validity_test(starttime, endtime, h0_max=0.0001):
 	strainH = TimeSeries.read(pathtoinput+'S6framesH1.lcf',channel='H1:LDAS-STRAIN', start=starttime, end=endtime)
 	strainL = TimeSeries.read(pathtoinput+'S6framesL1.lcf',channel='L1:LDAS-STRAIN', start=starttime, end=endtime)
 	num_points = int(durationH/Xspacing)
-	h0_min=0.000001
+	h0_min=0.00005
 	h0_vals_num=30
 
 	# Adding in a fake signal
@@ -201,7 +201,7 @@ def validity_test(starttime, endtime, h0_max=0.0001):
 				detSigma = np.linalg.det(Sigma)
 				chi = np.dot(Sigma, np.dot(M.T, np.dot(invC, d)))
 				ppsi[k]    = 0.5*np.log(detSigma) - 0.5*np.log(16.*np.pi**4*detSigma0*detC) -  0.5*(np.vdot(d.T, np.dot(invC, d)) + np.vdot(chi.T, np.dot(invSigma, chi)))
-			p[0][j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
+			p[j] += logdpsi_2 + logsumexp([logsumexp(ppsi[:-1]), logsumexp(ppsi[1:])])
 
 
 	# Write into a file.
