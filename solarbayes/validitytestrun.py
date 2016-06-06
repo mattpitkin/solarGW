@@ -1,4 +1,4 @@
-def validity_test(starttime, endtime, h0_max=0.001):
+def validity_test(starttime, endtime, h0_max=0.0001):
 	#------- Packages ---------#
 	print 'Importing packages'
 	import numpy as np
@@ -29,7 +29,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	# Adding in a fake signal
 	# frequency in the middle of the range we're interested in 125 Hz
 	omega = 250.0*np.pi
-	amplitude = 0.5e-26 # (hopefully) middle of h0 values
+	amplitude = 0.5e-24 # (hopefully) middle of h0 values
 	# the signal to introduce is of the form amplitude*np.sin(omega*t)
 	# first get timeL and timeH in synch with the sun's position
 
@@ -161,7 +161,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	for i in range(num_points):
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
 		FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
-	p = [[0  for _ in range(len(h0_array))] for _ in range(2)]
+	p = [0  for _ in range(len(h0_array))]
 	ppsi = [0 for _ in range(len(psi_array))]
 	logdpsi_2 = np.log(0.5*dpsi)
 
@@ -187,8 +187,8 @@ def validity_test(starttime, endtime, h0_max=0.001):
 			int0 = i - int(60/Xspacing)
 		else:
 			int0 = 0
-		sigmaX = np.std(newstrainH0[int0:int1])
-		sigmaY = np.std(newstrainL0[int0:int1])
+		sigmaX = np.std(dX[int0:int1])
+		sigmaY = np.std(dY[int0:int1])
 		C = np.array([[sigmaX**2, 0.], [0., sigmaY**2]])
 		invC = np.array([[(1./sigmaX**2), 0.], [0., (1/sigmaY**2)]])
 		detC = sigmaX**2 * sigmaY**2
