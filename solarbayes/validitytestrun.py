@@ -56,7 +56,7 @@ def validity_test(starttime, endtime, h0_max=0.001):
 							coordstime=seg30[i]
 							coords = get_sun(Time.Time(coordstime,format='gps'))
 							tdelay[i] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
-	tdelay = np.repeat(tdelay,int(30/Xspacing))
+	
 	coordstime = seg30[-1]
 	coords     = get_sun(Time.Time(coordstime,format='gps'))
 	tdelay[-1] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
@@ -67,12 +67,13 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	b = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
 	tdelay = np.append(tdelay,b)
 	timeL = timeL - tdelay
+	
 
 	#------------ Down-sampling ------------#
 	print 'Down-sampling'
-	Xspacing = Xspacing*32
+	Xspacing = Xspacing*8
 	num_points = int(durationH/Xspacing)
-	newtimeL, newtimeH, newerstrainH, newerstrainL = [[0 for _ in range(num_points)] for _ in range(4)]
+	newtimeL, newtimeH, newstrainH, newstrainL, newtdelay = [[0 for _ in range(num_points)] for _ in range(5)]
 	for i in range(num_points):
 		j = 8*i + 4
 		newstrainH[i] = np.mean(strainH[j-4:j+4])
@@ -83,35 +84,49 @@ def validity_test(starttime, endtime, h0_max=0.001):
 
 	newstrainH = newstrainH[76800:len(newstrainH)]
 	newstrainL = newstrainL[76800:len(newstrainL)]
-	newtimeH   = newtimeH[76800:-1]
-	newtimeL   = newtimeL[76800:-1]
+	newtimeH   = newtimeH[76800:len(newtimeH)]
+	newtimeL   = newtimeL[76800:len(newtimeL)]
 	starttime  = starttime + 150
 	durationH  = int(newtimeH[-1]) - int(newtimeH[0])
 	num_points = int(durationH/Xspacing)
 	del timeL, timeH, tdelay, strainH, strainL
 	#----------- add in fake signal ------------#
+	newtimeH = newtimeH[0:num_points]
+	newtimeL = newtimeL[0:num_points]
 	print 'Insert fake signal'
+	print 'num_points ', num_points
+	print 'len(newtimeL) ',len(newtimeL)
+        numseg = int((durationH)/600)
+        segs = np.linspace(0,numseg,numseg+1)*600
+        segs = segs + newtimeL[0]
+	psi1=np.pi/4
+        ra,dec,fp,fc = [[0 for _ in range(numseg+1)] for _ in range(4)]
+        for i in range(numseg+1):
+                coordstime = segs[i]
+                coords = get_sun(Time.Time(coordstime,format='gps'))
+                ra[i] = coords.ra.hour*np.pi/12
+                dec[i] = coords.dec.hour*np.pi/12
 	FcX0, FpX0, FcY0, FpY0 = [[0 for _ in range(num_points)] for _ in range(4)]
 	for i in range(num_points):
 		FpX0[i], FcX0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'H1')
 		FpY0[i], FcY0[i] = ant_res(gpsTime[int(i*Xspacing/600.)], ra[int(i*Xspacing/600.)], dec[int(i*Xspacing/600.)], 0, 'L1')
 	cos2pi1 = np.cos(2*psi1)
 	sin2pi1 = np.sin(2*psi1)
-	FpX, FcX, FpY, FcY = [[0 for _ in range(num_points)] for _ in range(4)]
+	fakeH, fakeL, FpX, FcX, FpY, FcY = [[0 for _ in range(num_points)] for _ in range(6)]
 	for i in range(num_points):
 		FpX[i] = FpX0[i]*cos2pi1 + FcX0[i]*sin2pi1
 		FcX[i] = FcX0[i]*cos2pi1 - FpX0[i]*sin2pi1
 		FpY[i] = FpY0[i]*cos2pi1 + FcY0[i]*sin2pi1
 		FcY[i] = FcY0[i]*cos2pi1 - FpY0[i]*sin2pi1
-
-	fakeH = amplitude*(FpX*np.sin(omega*newtimeH) + FcX*np.cos(omega*newtimeH))
-	fakeL = amplitude*(FpY*np.sin(omega*newtimeL) + FcY*np.cos(omega*newtimeL))
-	tdelayidx  = [0 for _ in range(len(tdelay))]
-	for i in range(len(tdelay)):
-		tdelayidx[i] = int(tdelay[i]*Xspacing)
+	for i in range(len(newtimeH)):
+		fakeH[i] = amplitude*(FpX[i]*np.sin(omega*newtimeH[i]) + FcX[i]*np.cos(omega*newtimeH[i]))
+		fakeL[i] = amplitude*(FpY[i]*np.sin(omega*newtimeL[i]) + FcY[i]*np.cos(omega*newtimeL[i]))
+	tdelayidx  = [0 for _ in range(len(newtdelay))]
+	for i in range(len(newtdelay)):
+		tdelayidx[i] = int(newtdelay[i]*Xspacing)
 	idxmax= np.max(tdelayidx)
-	newstrainL0,newstrainH0 = [[0 for _ in range(len(tdelay)-idxmax)] for _ in range(2)]
-	for i in range(idxmax,len(tdelay)):
+	newstrainL0,newstrainH0 = [[0 for _ in range(len(newtdelay)-idxmax)] for _ in range(2)]
+	for i in range(idxmax,len(newtdelay)):
 		newstrainL0[i-idxmax]=newstrainL[i-tdelayidx[i]]
 	newstrainH0=newstrainH[0:len(newstrainL0)]
 
@@ -131,15 +146,6 @@ def validity_test(starttime, endtime, h0_max=0.001):
 	#------------ Finding probability distribution ------------#
 	#   ------------ Defining some stuff for p -------------   #
 	print 'Finding likelihood Part 1/2'
-	numseg = int((durationH)/600)
-	segs = np.linspace(0,numseg,numseg+1)*600
-	segs = segs + newtimeL[0]
-	ra,dec,fp,fc = [[0 for _ in range(numseg+1)] for _ in range(4)]
-	for i in range(numseg+1):
-		coordstime = segs[i]
-		coords = get_sun(Time.Time(coordstime,format='gps'))
-		ra[i] = coords.ra.hour*np.pi/12
-		dec[i] = coords.dec.hour*np.pi/12
 	psi_array = np.linspace(0,np.pi,10)
 	dpsi = psi_array[1]-psi_array[0]
 	sigmaA = 10.0
