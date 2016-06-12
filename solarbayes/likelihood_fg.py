@@ -26,8 +26,8 @@ parser.add_option("--proc", type="float", help="Job ID")
 starttime = opts.starttime
 endtime   = opts.endtime
 h0_max    = opts.h0
-wm = 'fg
-'
+wm = 'all/fg500'
+
 #-------- Importing, filtering and timeshifting data ----------#
 durationH    = endtime - starttime
 oldstarttime = starttime
@@ -66,10 +66,10 @@ for i in range(numseg30-1):
 			tdelay[i] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
 coordstime = seg30[-1]
 coords     = get_sun(Time.Time(coordstime,format='gps'))
-del coords, coordstime, seg30
 tdelay[-1] = lal.ArrivalTimeDiff(detH1.location, detL1.location, coords.ra.hour*np.pi/12, coords.dec.hour*np.pi/12, tgps)
 tdelay     = np.array(tdelay)
 tdelay     = np.repeat(tdelay,int(30/Xspacing))
+del coords, coordstime
 # make sure tdelay and timeL are of same length in case integer-ing caused slight inconsistency.
 b      = np.ones(len(timeL)-len(tdelay))*tdelay[-1]
 tdelay = np.append(tdelay,b)
@@ -120,9 +120,10 @@ for i in range(numseg+1):
 	dec[i] = coords.dec.hour*np.pi/12
 psi_array = np.linspace(0,np.pi,10)
 dpsi = psi_array[1]-psi_array[0]
-sigmaA = 100.0
-h0min = h0_min*np.std(newstrainH0)
-h0max = h0_max*np.std(newstrainH0)
+sigmaA = 500.0
+stdav = 10**(-21)
+h0min = h0_min*stdav
+h0max = h0_max*stdav
 h0_array = np.linspace(h0min,h0max,h0_vals_num)
 invSigma0 = np.array([[(1./sigmaA**2), 0.], [0., (1./sigmaA**2)]])
 detSigma0 = sigmaA**4
