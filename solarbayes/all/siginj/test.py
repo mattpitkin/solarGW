@@ -6,7 +6,7 @@ def show_res(starttime):
     h0 = np.array(np.loadtxt('h0'+str(starttime)+'.txt',dtype='f8'))
     p  = np.array(np.loadtxt('p'+str(starttime)+'.txt',dtype='f8'))
     p = np.exp(p-np.max(p))
-    pathtointersect = '../../../intersect_old.txt'
+    pathtointersect = '../../../intersect.txt'
     timearray = np.array(np.loadtxt(pathtointersect,dtype='f8'))
     StartTimes = timearray[:,0]
     EndTimes   = timearray[:,1]
@@ -14,7 +14,7 @@ def show_res(starttime):
         if starttime == StartTimes[i]:
             idx=i
         else:
-            pass
+            print 'Error: starttime unrecognised', starttime
     duration = EndTimes[idx] - StartTimes[idx]
     with PdfPages(fname) as pdf:
         fig1 = plt.figure()
