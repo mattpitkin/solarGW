@@ -1,0 +1,366 @@
+JOB 1 bayesjob.sub
+VARS 1 starttime="933658954" endtime="933661172" h0="1e-05"
+JOB 2 bayesjob.sub
+VARS 2 starttime="933686222" endtime="933686546" h0="1e-05"
+JOB 3 bayesjob.sub
+VARS 3 starttime="933687004" endtime="933687186" h0="1e-05"
+JOB 4 bayesjob.sub
+VARS 4 starttime="933687670" endtime="933688208" h0="1e-05"
+JOB 5 bayesjob.sub
+VARS 5 starttime="933688811" endtime="933688862" h0="1e-05"
+JOB 6 bayesjob.sub
+VARS 6 starttime="933690244" endtime="933690487" h0="1e-05"
+JOB 7 bayesjob.sub
+VARS 7 starttime="933691001" endtime="933691789" h0="1e-05"
+JOB 8 bayesjob.sub
+VARS 8 starttime="933692386" endtime="933692699" h0="1e-05"
+JOB 9 bayesjob.sub
+VARS 9 starttime="933693197" endtime="933694205" h0="1e-05"
+JOB 10 bayesjob.sub
+VARS 10 starttime="933694689" endtime="933695265" h0="1e-05"
+JOB 11 bayesjob.sub
+VARS 11 starttime="933701582" endtime="933701661" h0="1e-05"
+JOB 12 bayesjob.sub
+VARS 12 starttime="933703007" endtime="933703058" h0="1e-05"
+JOB 13 bayesjob.sub
+VARS 13 starttime="933703973" endtime="933704909" h0="1e-05"
+JOB 14 bayesjob.sub
+VARS 14 starttime="933706234" endtime="933707068" h0="1e-05"
+JOB 15 bayesjob.sub
+VARS 15 starttime="933711220" endtime="933712476" h0="1e-05"
+JOB 16 bayesjob.sub
+VARS 16 starttime="933720060" endtime="933724188" h0="1e-05"
+JOB 17 bayesjob.sub
+VARS 17 starttime="933726635" endtime="933727094" h0="1e-05"
+JOB 18 bayesjob.sub
+VARS 18 starttime="933729755" endtime="933730677" h0="1e-05"
+JOB 19 bayesjob.sub
+VARS 19 starttime="933731371" endtime="933732989" h0="1e-05"
+JOB 20 bayesjob.sub
+VARS 20 starttime="933738363" endtime="933753294" h0="1e-05"
+JOB 21 bayesjob.sub
+VARS 21 starttime="933755040" endtime="933758333" h0="1e-05"
+JOB 22 bayesjob.sub
+VARS 22 starttime="933767644" endtime="933767645" h0="1e-05"
+JOB 23 bayesjob.sub
+VARS 23 starttime="933772816" endtime="933773021" h0="1e-05"
+JOB 24 bayesjob.sub
+VARS 24 starttime="933774442" endtime="933776013" h0="1e-05"
+JOB 25 bayesjob.sub
+VARS 25 starttime="933778716" endtime="933780698" h0="1e-05"
+JOB 26 bayesjob.sub
+VARS 26 starttime="933781482" endtime="933783411" h0="1e-05"
+JOB 27 bayesjob.sub
+VARS 27 starttime="933784695" endtime="933785304" h0="1e-05"
+JOB 28 bayesjob.sub
+VARS 28 starttime="933785798" endtime="933794479" h0="1e-05"
+JOB 29 bayesjob.sub
+VARS 29 starttime="933795127" endtime="933796659" h0="1e-05"
+JOB 30 bayesjob.sub
+VARS 30 starttime="933798794" endtime="933808678" h0="1e-05"
+JOB 31 bayesjob.sub
+VARS 31 starttime="933809158" endtime="933810507" h0="1e-05"
+JOB 32 bayesjob.sub
+VARS 32 starttime="933816877" endtime="933817199" h0="1e-05"
+JOB 33 bayesjob.sub
+VARS 33 starttime="933817242" endtime="933820204" h0="1e-05"
+JOB 34 bayesjob.sub
+VARS 34 starttime="933822603" endtime="933825410" h0="1e-05"
+JOB 35 bayesjob.sub
+VARS 35 starttime="933826145" endtime="933826146" h0="1e-05"
+JOB 36 bayesjob.sub
+VARS 36 starttime="933829390" endtime="933842755" h0="1e-05"
+JOB 37 bayesjob.sub
+VARS 37 starttime="933843676" endtime="933844069" h0="1e-05"
+JOB 38 bayesjob.sub
+VARS 38 starttime="933844620" endtime="933851241" h0="1e-05"
+JOB 39 bayesjob.sub
+VARS 39 starttime="933865440" endtime="933866148" h0="1e-05"
+JOB 40 bayesjob.sub
+VARS 40 starttime="933866738" endtime="933867915" h0="1e-05"
+JOB 41 bayesjob.sub
+VARS 41 starttime="933872227" endtime="933873018" h0="1e-05"
+JOB 42 bayesjob.sub
+VARS 42 starttime="933873440" endtime="933876868" h0="1e-05"
+JOB 43 bayesjob.sub
+VARS 43 starttime="933880194" endtime="933882512" h0="1e-05"
+JOB 44 bayesjob.sub
+VARS 44 starttime="933883904" endtime="933884038" h0="1e-05"
+JOB 45 bayesjob.sub
+VARS 45 starttime="933884890" endtime="933884915" h0="1e-05"
+JOB 46 bayesjob.sub
+VARS 46 starttime="933885570" endtime="933890681" h0="1e-05"
+JOB 47 bayesjob.sub
+VARS 47 starttime="933891038" endtime="933891039" h0="1e-05"
+JOB 48 bayesjob.sub
+VARS 48 starttime="933891073" endtime="933895703" h0="1e-05"
+JOB 49 bayesjob.sub
+VARS 49 starttime="933897396" endtime="933900485" h0="1e-05"
+JOB 50 bayesjob.sub
+VARS 50 starttime="933900670" endtime="933907032" h0="1e-05"
+JOB 51 bayesjob.sub
+VARS 51 starttime="933909120" endtime="933913217" h0="1e-05"
+JOB 52 bayesjob.sub
+VARS 52 starttime="933925272" endtime="933927220" h0="1e-05"
+JOB 53 bayesjob.sub
+VARS 53 starttime="933928531" endtime="933929582" h0="1e-05"
+JOB 54 bayesjob.sub
+VARS 54 starttime="933930634" endtime="933934329" h0="1e-05"
+JOB 55 bayesjob.sub
+VARS 55 starttime="933942989" endtime="933942999" h0="1e-05"
+JOB 56 bayesjob.sub
+VARS 56 starttime="933945886" endtime="933947644" h0="1e-05"
+JOB 57 bayesjob.sub
+VARS 57 starttime="933951212" endtime="933952223" h0="1e-05"
+JOB 58 bayesjob.sub
+VARS 58 starttime="933953534" endtime="933954049" h0="1e-05"
+JOB 59 bayesjob.sub
+VARS 59 starttime="933956110" endtime="933957498" h0="1e-05"
+JOB 60 bayesjob.sub
+VARS 60 starttime="933958480" endtime="933960023" h0="1e-05"
+JOB 61 bayesjob.sub
+VARS 61 starttime="933965187" endtime="933969648" h0="1e-05"
+JOB 62 bayesjob.sub
+VARS 62 starttime="933999363" endtime="934001566" h0="1e-05"
+JOB 63 bayesjob.sub
+VARS 63 starttime="934004537" endtime="934011340" h0="1e-05"
+JOB 64 bayesjob.sub
+VARS 64 starttime="934012338" endtime="934012432" h0="1e-05"
+JOB 65 bayesjob.sub
+VARS 65 starttime="934015221" endtime="934023836" h0="1e-05"
+JOB 66 bayesjob.sub
+VARS 66 starttime="934024421" endtime="934025091" h0="1e-05"
+JOB 67 bayesjob.sub
+VARS 67 starttime="934026936" endtime="934026953" h0="1e-05"
+JOB 68 bayesjob.sub
+VARS 68 starttime="934028851" endtime="934029574" h0="1e-05"
+JOB 69 bayesjob.sub
+VARS 69 starttime="934065792" endtime="934066467" h0="1e-05"
+JOB 70 bayesjob.sub
+VARS 70 starttime="934079170" endtime="934081021" h0="1e-05"
+JOB 71 bayesjob.sub
+VARS 71 starttime="934083340" endtime="934084216" h0="1e-05"
+JOB 72 bayesjob.sub
+VARS 72 starttime="934085941" endtime="934090931" h0="1e-05"
+JOB 73 bayesjob.sub
+VARS 73 starttime="934093285" endtime="934099524" h0="1e-05"
+JOB 74 bayesjob.sub
+VARS 74 starttime="934103335" endtime="934111866" h0="1e-05"
+JOB 75 bayesjob.sub
+VARS 75 starttime="934112777" endtime="934113876" h0="1e-05"
+JOB 76 bayesjob.sub
+VARS 76 starttime="934126605" endtime="934126801" h0="1e-05"
+JOB 77 bayesjob.sub
+VARS 77 starttime="934127442" endtime="934127930" h0="1e-05"
+JOB 78 bayesjob.sub
+VARS 78 starttime="934129261" endtime="934129262" h0="1e-05"
+JOB 79 bayesjob.sub
+VARS 79 starttime="934129284" endtime="934129439" h0="1e-05"
+JOB 80 bayesjob.sub
+VARS 80 starttime="934130061" endtime="934130285" h0="1e-05"
+JOB 81 bayesjob.sub
+VARS 81 starttime="934130784" endtime="934131250" h0="1e-05"
+JOB 82 bayesjob.sub
+VARS 82 starttime="934143372" endtime="934145435" h0="1e-05"
+JOB 83 bayesjob.sub
+VARS 83 starttime="934150077" endtime="934150197" h0="1e-05"
+JOB 84 bayesjob.sub
+VARS 84 starttime="934151819" endtime="934152150" h0="1e-05"
+JOB 85 bayesjob.sub
+VARS 85 starttime="934164501" endtime="934167327" h0="1e-05"
+JOB 86 bayesjob.sub
+VARS 86 starttime="934169252" endtime="934169816" h0="1e-05"
+JOB 87 bayesjob.sub
+VARS 87 starttime="934172662" endtime="934173837" h0="1e-05"
+JOB 88 bayesjob.sub
+VARS 88 starttime="934173897" endtime="934179538" h0="1e-05"
+JOB 89 bayesjob.sub
+VARS 89 starttime="934180030" endtime="934191781" h0="1e-05"
+JOB 90 bayesjob.sub
+VARS 90 starttime="934194795" endtime="934198336" h0="1e-05"
+JOB 91 bayesjob.sub
+VARS 91 starttime="934200263" endtime="934203054" h0="1e-05"
+JOB 92 bayesjob.sub
+VARS 92 starttime="934203863" endtime="934204166" h0="1e-05"
+JOB 93 bayesjob.sub
+VARS 93 starttime="934205550" endtime="934205726" h0="1e-05"
+JOB 94 bayesjob.sub
+VARS 94 starttime="934213804" endtime="934213805" h0="1e-05"
+JOB 95 bayesjob.sub
+VARS 95 starttime="934214798" endtime="934215588" h0="1e-05"
+JOB 96 bayesjob.sub
+VARS 96 starttime="934216737" endtime="934217695" h0="1e-05"
+JOB 97 bayesjob.sub
+VARS 97 starttime="934223388" endtime="934223693" h0="1e-05"
+JOB 98 bayesjob.sub
+VARS 98 starttime="934230874" endtime="934231245" h0="1e-05"
+JOB 99 bayesjob.sub
+VARS 99 starttime="934231889" endtime="934235763" h0="1e-05"
+JOB 100 bayesjob.sub
+VARS 100 starttime="934242716" endtime="934243990" h0="1e-05"
+JOB 101 bayesjob.sub
+VARS 101 starttime="934248432" endtime="934250640" h0="1e-05"
+JOB 102 bayesjob.sub
+VARS 102 starttime="934257654" endtime="934258843" h0="1e-05"
+JOB 103 bayesjob.sub
+VARS 103 starttime="934260498" endtime="934261893" h0="1e-05"
+JOB 104 bayesjob.sub
+VARS 104 starttime="934265631" endtime="934267289" h0="1e-05"
+JOB 105 bayesjob.sub
+VARS 105 starttime="934268094" endtime="934268336" h0="1e-05"
+JOB 106 bayesjob.sub
+VARS 106 starttime="934278581" endtime="934281810" h0="1e-05"
+JOB 107 bayesjob.sub
+VARS 107 starttime="934283453" endtime="934283481" h0="1e-05"
+JOB 108 bayesjob.sub
+VARS 108 starttime="934283944" endtime="934287307" h0="1e-05"
+JOB 109 bayesjob.sub
+VARS 109 starttime="934288910" endtime="934289018" h0="1e-05"
+JOB 110 bayesjob.sub
+VARS 110 starttime="934294840" endtime="934294888" h0="1e-05"
+JOB 111 bayesjob.sub
+VARS 111 starttime="934296359" endtime="934296368" h0="1e-05"
+JOB 112 bayesjob.sub
+VARS 112 starttime="934298264" endtime="934298941" h0="1e-05"
+JOB 113 bayesjob.sub
+VARS 113 starttime="934302193" endtime="934303847" h0="1e-05"
+JOB 114 bayesjob.sub
+VARS 114 starttime="934306148" endtime="934306512" h0="1e-05"
+JOB 115 bayesjob.sub
+VARS 115 starttime="934307215" endtime="934307649" h0="1e-05"
+JOB 116 bayesjob.sub
+VARS 116 starttime="934309513" endtime="934312061" h0="1e-05"
+JOB 117 bayesjob.sub
+VARS 117 starttime="934315699" endtime="934316533" h0="1e-05"
+JOB 118 bayesjob.sub
+VARS 118 starttime="934318816" endtime="934319983" h0="1e-05"
+JOB 119 bayesjob.sub
+VARS 119 starttime="934321640" endtime="934322142" h0="1e-05"
+JOB 120 bayesjob.sub
+VARS 120 starttime="934324418" endtime="934329485" h0="1e-05"
+JOB 121 bayesjob.sub
+VARS 121 starttime="934335327" endtime="934337090" h0="1e-05"
+JOB 122 bayesjob.sub
+VARS 122 starttime="934341532" endtime="934348551" h0="1e-05"
+JOB 123 bayesjob.sub
+VARS 123 starttime="934349542" endtime="934350097" h0="1e-05"
+JOB 124 bayesjob.sub
+VARS 124 starttime="934351875" endtime="934366564" h0="1e-05"
+JOB 125 bayesjob.sub
+VARS 125 starttime="934367833" endtime="934371277" h0="1e-05"
+JOB 126 bayesjob.sub
+VARS 126 starttime="934384079" endtime="934384281" h0="1e-05"
+JOB 127 bayesjob.sub
+VARS 127 starttime="934384915" endtime="934387170" h0="1e-05"
+JOB 128 bayesjob.sub
+VARS 128 starttime="934389917" endtime="934389918" h0="1e-05"
+JOB 129 bayesjob.sub
+VARS 129 starttime="934390045" endtime="934394331" h0="1e-05"
+JOB 130 bayesjob.sub
+VARS 130 starttime="934395124" endtime="934395267" h0="1e-05"
+JOB 131 bayesjob.sub
+VARS 131 starttime="934395826" endtime="934397134" h0="1e-05"
+JOB 132 bayesjob.sub
+VARS 132 starttime="934397655" endtime="934397656" h0="1e-05"
+JOB 133 bayesjob.sub
+VARS 133 starttime="934397663" endtime="934398835" h0="1e-05"
+JOB 134 bayesjob.sub
+VARS 134 starttime="934399263" endtime="934401750" h0="1e-05"
+JOB 135 bayesjob.sub
+VARS 135 starttime="934403218" endtime="934409208" h0="1e-05"
+JOB 136 bayesjob.sub
+VARS 136 starttime="934413129" endtime="934415681" h0="1e-05"
+JOB 137 bayesjob.sub
+VARS 137 starttime="934417984" endtime="934417998" h0="1e-05"
+JOB 138 bayesjob.sub
+VARS 138 starttime="934419362" endtime="934427328" h0="1e-05"
+JOB 139 bayesjob.sub
+VARS 139 starttime="934431730" endtime="934432518" h0="1e-05"
+JOB 140 bayesjob.sub
+VARS 140 starttime="934434470" endtime="934438483" h0="1e-05"
+JOB 141 bayesjob.sub
+VARS 141 starttime="934439452" endtime="934444664" h0="1e-05"
+JOB 142 bayesjob.sub
+VARS 142 starttime="934459510" endtime="934463361" h0="1e-05"
+JOB 143 bayesjob.sub
+VARS 143 starttime="934488006" endtime="934497190" h0="1e-05"
+JOB 144 bayesjob.sub
+VARS 144 starttime="934498043" endtime="934503550" h0="1e-05"
+JOB 145 bayesjob.sub
+VARS 145 starttime="934518086" endtime="934521545" h0="1e-05"
+JOB 146 bayesjob.sub
+VARS 146 starttime="934524311" endtime="934531269" h0="1e-05"
+JOB 147 bayesjob.sub
+VARS 147 starttime="934534908" endtime="934539865" h0="1e-05"
+JOB 148 bayesjob.sub
+VARS 148 starttime="934586382" endtime="934586384" h0="1e-05"
+JOB 149 bayesjob.sub
+VARS 149 starttime="934586648" endtime="934588346" h0="1e-05"
+JOB 150 bayesjob.sub
+VARS 150 starttime="934593938" endtime="934594320" h0="1e-05"
+JOB 151 bayesjob.sub
+VARS 151 starttime="934603526" endtime="934603805" h0="1e-05"
+JOB 152 bayesjob.sub
+VARS 152 starttime="934604276" endtime="934607122" h0="1e-05"
+JOB 153 bayesjob.sub
+VARS 153 starttime="934608260" endtime="934617379" h0="1e-05"
+JOB 154 bayesjob.sub
+VARS 154 starttime="934620706" endtime="934623791" h0="1e-05"
+JOB 155 bayesjob.sub
+VARS 155 starttime="934626312" endtime="934629672" h0="1e-05"
+JOB 156 bayesjob.sub
+VARS 156 starttime="934678632" endtime="934681632" h0="1e-05"
+JOB 157 bayesjob.sub
+VARS 157 starttime="934683337" endtime="934684584" h0="1e-05"
+JOB 158 bayesjob.sub
+VARS 158 starttime="934684962" endtime="934687193" h0="1e-05"
+JOB 159 bayesjob.sub
+VARS 159 starttime="934688697" endtime="934698298" h0="1e-05"
+JOB 160 bayesjob.sub
+VARS 160 starttime="934700165" endtime="934705782" h0="1e-05"
+JOB 161 bayesjob.sub
+VARS 161 starttime="934708092" endtime="934713869" h0="1e-05"
+JOB 162 bayesjob.sub
+VARS 162 starttime="934715360" endtime="934715647" h0="1e-05"
+JOB 163 bayesjob.sub
+VARS 163 starttime="934716304" endtime="934716580" h0="1e-05"
+JOB 164 bayesjob.sub
+VARS 164 starttime="934769511" endtime="934772839" h0="1e-05"
+JOB 165 bayesjob.sub
+VARS 165 starttime="934773714" endtime="934781817" h0="1e-05"
+JOB 166 bayesjob.sub
+VARS 166 starttime="934782782" endtime="934785893" h0="1e-05"
+JOB 167 bayesjob.sub
+VARS 167 starttime="934801640" endtime="934802298" h0="1e-05"
+JOB 168 bayesjob.sub
+VARS 168 starttime="934802778" endtime="934803761" h0="1e-05"
+JOB 169 bayesjob.sub
+VARS 169 starttime="934867679" endtime="934869535" h0="1e-05"
+JOB 170 bayesjob.sub
+VARS 170 starttime="934883764" endtime="934886500" h0="1e-05"
+JOB 171 bayesjob.sub
+VARS 171 starttime="934945006" endtime="934945603" h0="1e-05"
+JOB 172 bayesjob.sub
+VARS 172 starttime="934948257" endtime="934955323" h0="1e-05"
+JOB 173 bayesjob.sub
+VARS 173 starttime="934957381" endtime="934972201" h0="1e-05"
+JOB 174 bayesjob.sub
+VARS 174 starttime="934973577" endtime="934974572" h0="1e-05"
+JOB 175 bayesjob.sub
+VARS 175 starttime="935130544" endtime="935133701" h0="1e-05"
+JOB 176 bayesjob.sub
+VARS 176 starttime="935136614" endtime="935136904" h0="1e-05"
+JOB 177 bayesjob.sub
+VARS 177 starttime="935137582" endtime="935139791" h0="1e-05"
+JOB 178 bayesjob.sub
+VARS 178 starttime="935142087" endtime="935145847" h0="1e-05"
+JOB 179 bayesjob.sub
+VARS 179 starttime="935147187" endtime="935147799" h0="1e-05"
+JOB 180 bayesjob.sub
+VARS 180 starttime="935659145" endtime="935659146" h0="1e-05"
+JOB 181 bayesjob.sub
+VARS 181 starttime="935659159" endtime="935659161" h0="1e-05"
+JOB 182 bayesjob.sub
+VARS 182 starttime="935659237" endtime="935659238" h0="1e-05"
+JOB 183 bayesjob.sub
+VARS 183 starttime="935659260" endtime="935659262" h0="1e-05"

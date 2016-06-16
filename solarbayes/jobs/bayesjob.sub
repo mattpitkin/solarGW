@@ -1,0 +1,11 @@
+universe=vanilla
+getenv=True
+executable= /home/spxha/solarGW/solarbayes/likelihood_job.py
+arguments = --start $(starttime) --end $(endtime) --h0_max $(h0)
+log = /home/spxha/solarGW/solarbayes/likelihoodlog.txt
+output = /home/spxha/solarGW/solarbayes/likelihoodout.txt
+error = /home/spxha/solarGW/solarbayes/likelihooderror.txt
+notification = never
+accounting_group = aluk.dev.s6.sgwb.solargw
+accounting_group_user = husni.almoubayyed
+queue 1
